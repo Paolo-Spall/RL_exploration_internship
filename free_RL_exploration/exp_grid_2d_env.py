@@ -8,6 +8,7 @@ from stable_baselines3.common.env_checker import check_env
 
 
 class ExpGrid2D(gym.Env):
+    metadata = {"render_modes": ["human"]}
     obstacle_color = 170  # Dark gray for obstacles
     unknown_color = 85  # Light gray for unknown cells
     agent_color = 255  # Black for agent position
@@ -18,14 +19,15 @@ class ExpGrid2D(gym.Env):
                  height, 
                  obstacle_prob=0.2, 
                  perc_range=1, 
-                 render=False,
+                 render_mode=None,
                  cnn=True):
+        
         super().__init__()
         self.width = width
         self.height = height
         self.obstacle_prob = obstacle_prob
         self.perc_range = perc_range
-        self.render = render
+        self.render_mode = render_mode
         self.cnn = cnn
 
         self.total_cells = width * height
@@ -48,7 +50,7 @@ class ExpGrid2D(gym.Env):
             2: np.array([-1, 0]),  # Move left (negative x)
             3: np.array([0, -1]),  # Move down (negative y)
         }
-        if self.render:
+        if self.render_mode == "human":
             self.init_simulation_render()
 
     ## SETTING THE ENVIRONMENT GRID
@@ -110,8 +112,8 @@ class ExpGrid2D(gym.Env):
         self.init_agent_position()
         self.update_obs_grid()
 
-        if self.render:
-            self.display()
+        if self.render_mode == "human":
+            self.render()
 
         obs = self._get_obs()
 
@@ -136,8 +138,8 @@ class ExpGrid2D(gym.Env):
             terminated = True
             reward += 10  # big reward for completing exploration
 
-        if self.render:
-            self.display()
+        if self.render_mode == "human":
+            self.render()
         
         obs = self._get_obs()
 
@@ -192,7 +194,7 @@ class ExpGrid2D(gym.Env):
     def init_simulation_render(self):
         self.fig , (self.ax_env, self.ax_obs) = plt.subplots(1,2, figsize=(10,5))
 
-    def display(self):
+    def render(self):
         self.ax_env.clear()
         self.ax_obs.clear()
         
@@ -207,7 +209,7 @@ class ExpGrid2D(gym.Env):
 
 
 if __name__ == "__main__":
-    width, height = 36, 36
+    width, height = 10, 10
     obstacle_prob = 0.025
     perc_range = 2
     print("Creating environment...")
@@ -215,14 +217,14 @@ if __name__ == "__main__":
                        height, 
                        obstacle_prob, 
                        perc_range=perc_range, 
-                       render=True, 
+                       render_mode="human", 
                        cnn=False)
 
-    check_env(env, warn=True)
-    # print("Resetting environment...")
-    # env.reset()
-    # print("Stepping through the environment...")
+    # check_env(env, warn=True)
+    print("Resetting environment...")
+    env.reset()
+    print("Stepping through the environment...")
 
-    # for _ in range(100):
-    #     action = random.randint(0,3)
-    #     env.step(action)
+    for _ in range(100):
+        action = random.randint(0,3)
+        env.step(action)

@@ -1,11 +1,11 @@
 from stable_baselines3 import PPO
 from exp_grid_2d_env import ExpGrid2D
 
-env = ExpGrid2D(width=36, 
-                   height=36, 
+env = ExpGrid2D(width=10, 
+                   height=10, 
                    obstacle_prob=0.025, 
                    perc_range=2, 
-                   render=False, 
+                   render_mode=None, 
                    cnn=False)
 
 model = PPO("MlpPolicy", env, verbose=1, device="cpu")
