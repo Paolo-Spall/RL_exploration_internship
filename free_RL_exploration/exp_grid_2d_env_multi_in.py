@@ -21,7 +21,7 @@ class ExpGrid2D(gym.Env):
                  perc_range=1, 
                  max_steps = 100,      # or any number you want
                  render_mode=None,
-                 policy_type='mlp'):
+                 policy_type='MlpPolicy'):
         
         super().__init__()
         self.width = width
@@ -37,14 +37,19 @@ class ExpGrid2D(gym.Env):
         self.discovered_cells = 0
 
         self.action_space = spaces.Discrete(4)  # R,D,L,U
-        if self.policy_type == 'cnn':
+        if self.policy_type == 'CnnPolicy':
             self.observation_space = spaces.Box(
                 low=0, high=255, shape=(height, width, 1), dtype=np.uint8
             )
-        elif self.policy_type == 'mlp':
+        elif self.policy_type == 'MlpPolicy':
             self.observation_space = spaces.Box(
                 low=0, high=255, shape=(height * width,), dtype=np.uint8
             )
+        elif self.policy_type == 'MultiInputPolicy':
+            self.observation_space = spaces.Dict({
+                'grid': spaces.Box(low=0, high=255, shape=(height, width, 1), dtype=np.uint8),
+                'position': spaces.Box(low=0, high=max(width, height), shape=(2,), dtype=np.int32)
+            })
 
 
         self._action_to_direction = {
@@ -139,7 +144,7 @@ class ExpGrid2D(gym.Env):
             if discovered_cells == 0:
                 reward -= 0.1  # small penalty for no new discovery
             else:
-                reward += discovered_cells * 0.5  # reward for discovering new cells
+                reward += discovered_cells/self.perc_range * 0.1  # reward for discovering new cells
         else:
             reward = -1  # penalty for invalid move
         
@@ -159,10 +164,15 @@ class ExpGrid2D(gym.Env):
         return  obs, reward, bool(terminated) , bool(truncated), {}
 
     def _get_obs(self):
-        if self.policy_type == 'cnn':
+        if self.policy_type == 'CnnPolicy':
             return self.obs_grid[:, :, np.newaxis]
-        elif self.policy_type == 'mlp':
+        elif self.policy_type == 'MlpPolicy':
             return self.obs_grid.flatten()
+        elif self.policy_type == 'MultiInputPolicy':
+            return {
+                'grid': self.obs_grid[:, :, np.newaxis],
+                'position': self.agent_pos.copy()
+            }
         
 
     def update_obs_grid(self):
