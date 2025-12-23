@@ -1,0 +1,31 @@
+model_name: 'exp3'
+train: true
+
+env:
+  width: 20
+  height: 20
+  obstacle_prob: 0.0
+  perc_range: 5
+  max_steps: 50
+  render_mode: null
+  policy_type: MlpPolicy
+
+model:
+  policy: MlpPolicy
+  device: cpu
+  learning_rate: 0.0005
+  batch_size: 64
+  buffer_size: 50000
+  exploration_fraction: 0.7
+  exploration_final_eps: 0.05
+  target_update_interval: 500
+  train_freq: 4
+
+wrapper:
+  VecTransposeImage: False
+  VecNormalize:
+    norm_obs: False
+    norm_reward: true
+
+training:
+  total_timesteps: 1000000
