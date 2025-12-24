@@ -37,6 +37,7 @@ class ExpGrid2D(gym.Env):
         self.discovered_cells = 0
 
         self.action_space = spaces.Discrete(4)  # R,D,L,U
+        
         if self.policy_type == 'CnnPolicy':
             self.observation_space = spaces.Box(
                 low=0, high=255, shape=(height, width, 1), dtype=np.uint8

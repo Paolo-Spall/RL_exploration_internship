@@ -1,0 +1,35 @@
+model_name: exp_PPO_Multi_try
+model_class: PPO
+train: true
+
+env:
+  width: 20
+  height: 20
+  obstacle_prob: 0.0
+  perc_range: 5
+  max_steps: 50
+  render_mode: null
+  policy_type: MultiInputPolicy
+
+model:
+  policy: MultiInputPolicy
+  device: cpu
+  learning_rate: 0.0003
+  n_steps: 2048
+  batch_size: 64
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+
+wrapper:
+  VecTransposeImage: False
+  VecNormalize:
+    norm_obs: True
+    norm_reward: True
+
+training:
+  total_timesteps: 100

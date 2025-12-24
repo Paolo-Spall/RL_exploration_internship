@@ -1,4 +1,4 @@
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, PPO
 from exp_grid_2d_env_multi_in import ExpGrid2D
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from stable_baselines3.common.monitor import Monitor
@@ -7,9 +7,10 @@ from stable_baselines3.common.evaluation import evaluate_policy
 
 import yaml
 
-config_file = "configs/config_ex.yaml"
 
-def train_model(config_file):
+
+def train_model(model_name):
+    config_file = f"configs/config_{model_name}.yaml"
 
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
@@ -33,7 +34,10 @@ def train_model(config_file):
 
     #env = TimeLimit(env, max_episode_steps=100)
 
-    model = DQN(
+    class_str = config.get('model_class')
+    model_class = globals()[class_str]
+
+    model = model_class(
         env=env,
         verbose=1,
         **config['model']
@@ -48,7 +52,8 @@ def train_model(config_file):
 
     ## EVALUATION
 
-def evaluate_model(config_file):
+def evaluate_model(model_name):
+    config_file = f"configs/config_{model_name}.yaml"
 
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
@@ -75,7 +80,10 @@ def evaluate_model(config_file):
     # do not normalize observations at test time
     eval_env.norm_obs = False
 
-    model = DQN.load(f"models/{model_name}", env=eval_env, device="cpu")
+    class_str = config.get('model_class')
+    model_class = globals()[class_str]
+
+    model = model_class.load(f"models/{model_name}", env=eval_env, device="cpu")
 
     mean_reward, std_reward = evaluate_policy(model, eval_env)
 
@@ -97,9 +105,12 @@ def test_render_model(model_name):
 
     env = ExpGrid2D(**config['env'])
 
+    class_str = config.get('model_class')
+    model_class = globals()[class_str]
+
     print("Loading trained model...")
     # Force CPU to avoid CUDA driver/runtime issues when loading the model
-    model = DQN.load(f"models/{model_name}", env=env, device="cpu")
+    model = model_class.load(f"models/{model_name}", env=env, device="cpu")
     print("Model loaded.")
 
     obs, _ = env.reset()
@@ -123,5 +134,6 @@ def test_render_model(model_name):
     env.close()
 
 if __name__ == "__main__":
+    config_file = "configs/config_ex.yaml"
     train_model(config_file)
     evaluate_model(config_file)

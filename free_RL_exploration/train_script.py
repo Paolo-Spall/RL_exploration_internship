@@ -1,9 +1,12 @@
 
 from train_utils import train_model, evaluate_model
-import yaml
+import sys
 
-config_files = ['configs/config_exp3.yaml']
+if len(sys.argv) > 1:
+    model_names = sys.argv[1:]
+else:
+    model_names = ['exp_PPO_Multi_1M', 'exp_PPO_Cnn_1M', 'exp_PPO_Mlp_1M']
 
-for config_file in config_files:
-    #train_model(config_file)
-    evaluate_model(config_file)
+for model_name in model_names:
+    train_model(model_name)
+    evaluate_model(model_name)
