@@ -1,5 +1,5 @@
 from stable_baselines3 import DQN, PPO
-from exp_grid_2d_env_multi_in import ExpGrid2D
+from environments import ExpGrid2D, Simple2DGrid
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import VecTransposeImage
@@ -19,10 +19,11 @@ def train_model(model_name):
     model_name = config['model_name']
 
     ## TRAINING
+    env_class_str = config.get('env_class')
+    env_class = globals()[env_class_str]
 
 
-    env = ExpGrid2D(**config['env'])
-
+    env = env_class(**config['env'])
     env = Monitor(env)
     env = DummyVecEnv([lambda: env])
 
@@ -62,7 +63,11 @@ def evaluate_model(model_name):
     model_name = config['model_name']
     print(f"Evaluating model: {model_name}")
 
-    eval_env = ExpGrid2D(**config['env'])
+    env_class_str = config.get('env_class')
+    env_class = globals()[env_class_str]
+
+
+    eval_env = env_class(**config['env'])
 
     eval_env = Monitor(eval_env)
     eval_env = DummyVecEnv([lambda: eval_env])
@@ -103,7 +108,11 @@ def test_render_model(model_name):
     config['env']['render_mode'] = 'human'
     model_name = config['model_name']
 
-    env = ExpGrid2D(**config['env'])
+    env_class_str = config.get('env_class')
+    env_class = globals()[env_class_str]
+
+
+    env = env_class(**config['env'])
 
     class_str = config.get('model_class')
     model_class = globals()[class_str]
@@ -118,7 +127,7 @@ def test_render_model(model_name):
     print("Starting exploration...")
     for step in range(300):
         action, _ = model.predict(obs, deterministic=True)
-        print("Action taken:", action, "action type:", type(action))
+        
         obs, reward, done, truncated, _ = env.step(action)
         print(f"Step: {step}, Reward: {reward}, Done: {done}")
 

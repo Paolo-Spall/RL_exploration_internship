@@ -23,7 +23,7 @@ class ExpGrid2D(gym.Env):
                  render_mode=None,
                  policy_type='MlpPolicy'):
         
-        super().__init__()
+        super().__init__() ## NECESSARY????
         self.width = width
         self.height = height
         self.obstacle_prob = obstacle_prob
@@ -158,6 +158,7 @@ class ExpGrid2D(gym.Env):
             reward -= 5  # penalty for running out of time
 
         if self.render_mode == "human":
+            print("Action: ", action, "Move: ", move)
             self.render()
         
         obs = self._get_obs()
@@ -223,6 +224,7 @@ class ExpGrid2D(gym.Env):
         self.ax_obs.clear()
         
         self.grid[self.agent_pos[1]][self.agent_pos[0]] = self.agent_color
+        print("Agent position:", self.agent_pos)
         #obs_map[self.agent_pos[1]][self.agent_pos[0]] = self.agent_color
         
         self.ax_env.imshow(self.grid, cmap='Greys')#, origin='upper', vmin=0, vmax=255)

@@ -1,5 +1,6 @@
 model_name: exp_PPO_try_DELETE_ME
 model_class: PPO
+env_class: 'ExpGrid2D'
 train: true
 
 env:
