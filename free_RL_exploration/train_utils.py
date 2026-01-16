@@ -1,5 +1,5 @@
 from stable_baselines3 import DQN, PPO
-from environments import ExpGrid2D, Simple2DGrid
+from environments import ExpGrid2D, Simple2DGrid, Simple2DGridObs, Simple2DGridMultiObs
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import VecTransposeImage

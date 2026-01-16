@@ -1,0 +1,30 @@
+model_name: 'frontier_exploration'
+train: true
+model_class: 'DQN'
+env_class: 'FrontierExplorationEnv'
+
+env:
+  height: 20
+  width: 20
+  max_steps: 250
+  render_mode: null
+
+model:
+  policy: MlpPolicy
+  device: cpu
+  learning_rate: 0.0005
+  batch_size: 64
+  buffer_size: 50000
+  exploration_fraction: 0.7
+  exploration_final_eps: 0.05
+  target_update_interval: 500
+  train_freq: 4
+
+wrapper:
+  VecTransposeImage: False
+  VecNormalize:
+    norm_obs: True
+    norm_reward: true
+
+training:
+  total_timesteps: 1000

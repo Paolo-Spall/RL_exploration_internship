@@ -1,0 +1,9 @@
+
+FRONTIERS
+- move "find_frontiers" and "cluster_frontiers" in a module
+
+FREE
+- try to increase max step number er episode
+
+GENERAL
+- re-structure the project in a more m odular way
