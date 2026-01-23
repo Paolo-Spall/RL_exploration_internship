@@ -1,9 +1,13 @@
 from stable_baselines3 import DQN, PPO
-from frontier_exploration.environments import ExplFrontGymStepCentrSort
+from lib.frontier_exploration.environments import ExplFrontGymStepCentrSort
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import VecTransposeImage
+
+model_name = "ExplFrontGymStepCentrSort_DQN_1e5"
+path = "models/"
+model_path = path + model_name
 
 width=20
 height=20 
@@ -24,10 +28,6 @@ env = Monitor(env)
 env = DummyVecEnv([lambda: env])
 env = VecNormalize(env, norm_obs=True, norm_reward=True)
 
-model_name = "ExplFrontGymStepCentrSort_DQN_1e6"
-path = "frontier_exploration/models/"
-model_path = path + model_name
-
 model = DQN("MultiInputPolicy", env, verbose=1, device="cpu",
     learning_rate=0.0005,
   batch_size=64,
@@ -38,7 +38,7 @@ model = DQN("MultiInputPolicy", env, verbose=1, device="cpu",
   train_freq=4)
 
 # total_timesteps: it's.e.g., the number of actions the agent will take in the environment during training
-model.learn(total_timesteps=1_000_000)
+model.learn(total_timesteps=100_000)
     
 model.save(model_path)
 
@@ -65,7 +65,7 @@ mean_reward, std_reward = evaluate_policy(model, eval_env)
 
 print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
 
-output_path = f"frontier_exploration/models/evaluation_{model_name}.txt"
+output_path = f"models/evaluation_{model_name}.txt"
 
 with open(output_path, "w") as f:
     f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")

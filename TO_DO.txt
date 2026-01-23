@@ -4,6 +4,8 @@ FRONTIERS
 
 FREE
 - try to increase max step number er episode
+- provare environment navigazione verdo target con ostacoli
+- provare environment exploration statico (ostacoli fermi)
 
 GENERAL
 - re-structure the project in a more m odular way

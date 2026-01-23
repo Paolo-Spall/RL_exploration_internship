@@ -1,32 +1,25 @@
 #!/usr/bin/python3
-from frontier_exploration.environments import ExplFrontGymStepCentrSort
-from frontier_exploration.utils import greedy_index
+# from lib.frontier_exploration.environments import ExplFrontGymStepCentrSort
+# from lib.utils import greedy_index
+from lib.grid_env.obst_grid_agent_env import ObstGridAgentEnv
+import matplotlib.pyplot as plt
 
 width, height = 20, 20
 obstacle_prob = 0.05
-target_discovery_percent = 0.9
-perc_range = 3
 print("Creating environment...")
-env = ExplFrontGymStepCentrSort(width=width, 
+env = ObstGridAgentEnv(width=width, 
                     height=height, 
-                    obstacle_prob=obstacle_prob, 
-                    target_discovery_percent=target_discovery_percent,
-                    perc_range=perc_range, 
                     render_mode="human", 
-                #    render_mode=False, 
-                    policy_type='mlp')
+                    obstacle_prob=obstacle_prob
+                )
 
-# check_env(env, warn=True)
-# print("Env checked.")
-# exit()
 print("Resetting environment...")
-obs, _ = env.reset()
-print("Stepping through the environment...")
+env.reset(init_agent_pos=(1,5))
+print("Rendering the environment...")
+env.render()
+plt.show()
 
-term = False
-
-while not term:
-    centroids = obs['frontier_centroids'].reshape(-1,2)
-    agent_pos = obs['agent_position']
-    action = greedy_index(centroids, agent_pos)
-    obs, reward, term,  trunc, _ = env.step(action)
+for action in range(4):
+    print("Taking action: ", action)
+    env.step(action)
+    plt.show()
