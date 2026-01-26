@@ -36,7 +36,8 @@ class NewExplFrontStepEnv(ObstGridAgentExplEnv):
                  relative=False,
                  distance=False,
                  sorting=True,
-                 reverse=False):
+                 reverse=False,
+                 information_gain=False):
         
         super().__init__(perception_range=perc_range, 
                          width=width, 
@@ -61,7 +62,7 @@ class NewExplFrontStepEnv(ObstGridAgentExplEnv):
         self.distance = distance
         self.sorting = sorting
         self.reverse = reverse
-
+        self.information_gain = information_gain
         self.total_cells = width * height
         self.discovered_cells = 0
 
@@ -104,7 +105,7 @@ class NewExplFrontStepEnv(ObstGridAgentExplEnv):
         super().reset(seed=seed, *args, **kwargs)
         
         self.update_obs_grid()
-        self.update_frontier_obs()
+        self.detect_frontiers()
         
         self.current_step = 0
 
@@ -137,7 +138,7 @@ class NewExplFrontStepEnv(ObstGridAgentExplEnv):
                 # small penalty for no new discovery
                 reward -= 1. / self.total_cells 
             else:
-                self.update_frontier_obs()
+                self.detect_frontiers()
 
                 # reward proportional to new discovered cells
                 reward += discovered_cells / self.total_cells  
@@ -160,8 +161,8 @@ class NewExplFrontStepEnv(ObstGridAgentExplEnv):
 
         return  obs, reward, bool(terminated) , bool(truncated), {}
 
-    def update_frontier_obs(self):
-        self.front_detector.detect(self.obs_grid, 
+    def detect_frontiers(self):
+        self.front_detector.detect_frontiers(self.obs_grid, 
                                     agent_pos=self.agent_pos)
         
         self.centroids = self.front_detector.centroids
@@ -169,9 +170,17 @@ class NewExplFrontStepEnv(ObstGridAgentExplEnv):
         self.clusters = self.front_detector.clusters
         self.relative_centroids = self.front_detector.relative_centroids
         self.relative_distances = self.front_detector.relative_distances
+        self.info_gain = self.front_detector.igain
+
+    # def add_info_gain(self):
+    #     if self.centroids.size ==0:
+    #         return
+    #     if 
 
 
     def _get_obs(self): 
+        if self.information_gain:
+            self.add_info_gain()
         if self.relative:
             return {'agent_position': self.agent_pos,
                     'frontier_centroids':self.relative_centroids.flatten()}
@@ -210,7 +219,7 @@ if __name__ == "__main__":
                                 render_mode="human",
                                 sorting=True,
                                 reverse=False,
-                                relative=False,
+                                relative=True,
                                 distance=False)
 
     check_env(env, warn=True)

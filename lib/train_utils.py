@@ -1,18 +1,47 @@
 from stable_baselines3 import DQN, PPO
 #from lib.free_RL_exploration.environments import ExpGrid2D, Simple2DGrid, Simple2DGridObs, Simple2DGridMultiObs
-from lib.frontier_exploration.environments import ExplFrontStepEnv,\
-                                                  ExplFrontStepDistancesEnv,\
-                                                  NewExplFrontStepEnv
+from lib.frontier_exploration.environments import MultiObsFrontierEnv, \
+                                                  MultiObsFrontAvoidanceEnv
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import VecTransposeImage
 from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.env_checker import check_env 
 
 import yaml
 
+def checkenv_script(model_name):
+    config = open_config(model_name)
+    env = initialize_model(config)
+    my_checkenv(env,config, model_name)
+    
+
+def my_checkenv(env,config, model_name):
+    print(f"Checking environment for model: {model_name}")
+    #print(f"Enironment class: {config.get('env_class')}")
+    check_env(env, warn=True)
+    print("Environment check done.")
 
 
-def train_model(model_name):
+def open_config(model_name):
+    config_file = f"configs/config_{model_name}.yaml"
+    with open(config_file, 'r') as f:
+        config = yaml.safe_load(f)
+    return config
+
+def initialize_model(config):
+
+    model_name = config['model_name']
+
+    ## TRAINING
+    env_class_str = config.get('env_class')
+    env_class = globals()[env_class_str]
+
+    env = env_class(**config['env'])
+    
+    return env
+
+def train_model(model_name, check=False):
     config_file = f"configs/config_{model_name}.yaml"
 
     with open(config_file, 'r') as f:
@@ -21,12 +50,17 @@ def train_model(model_name):
 
     model_name = config['model_name']
 
+
     ## TRAINING
     env_class_str = config.get('env_class')
     env_class = globals()[env_class_str]
 
 
     env = env_class(**config['env'])
+
+    if check:
+        my_checkenv(env,config, model_name)
+
     env = Monitor(env)
     env = DummyVecEnv([lambda: env])
 
@@ -43,11 +77,12 @@ def train_model(model_name):
 
     model = model_class(
         env=env,
-        verbose=1,
         **config['model']
     )
+    
+    print(f"Training model: {model_name}")
 
-    model.learn(total_timesteps=config['training']['total_timesteps']   )
+    model.learn(total_timesteps=config['training']['total_timesteps'] )
 
 
     model.save("models/" + model_name)
@@ -56,7 +91,7 @@ def train_model(model_name):
 
     ## EVALUATION
 
-def evaluate_model(model_name):
+def evaluate_model(model_name, check=False):
     config_file = f"configs/config_{model_name}.yaml"
 
     with open(config_file, 'r') as f:
@@ -71,6 +106,9 @@ def evaluate_model(model_name):
 
 
     eval_env = env_class(**config['env'])
+
+    if check:
+        my_checkenv(eval_env,config, model_name)
 
     eval_env = Monitor(eval_env)
     eval_env = DummyVecEnv([lambda: eval_env])
@@ -101,8 +139,9 @@ def evaluate_model(model_name):
     with open(output_file, "w") as f:
         f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")
     print(f"Evaluation results saved to {output_file}")
+    return mean_reward, std_reward
 
-def test_render_model(model_name):
+def test_render_model(model_name, check=False):
     config_file = f"configs/config_{model_name}.yaml"
 
     with open(config_file, 'r') as f:
@@ -116,6 +155,9 @@ def test_render_model(model_name):
 
 
     env = env_class(**config['env'])
+
+    if check:
+        my_checkenv(env,config, model_name)
 
     class_str = config.get('model_class')
     model_class = globals()[class_str]

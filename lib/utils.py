@@ -30,6 +30,7 @@ def manatthan_move(delta):
         return move
 
 def step_toward(start, target, manhattan=True):
+        """Computes the next position from start toward target by one step."""
         delta = target - start
         if manhattan:
             move = manatthan_move(delta)
@@ -38,6 +39,15 @@ def step_toward(start, target, manhattan=True):
         next_position  = start + move
         return next_position
 
+def move_toward(start, target, manhattan=True):
+        """Computes the next position from start toward target by one step."""
+        delta = target - start
+        if manhattan:
+            move = manatthan_move(delta)
+        else:
+            move = np.sign(delta)
+        return move
+
 def sort_array_by_distance(points_array, point):
     if len(points_array) == 0:
         return points_array
@@ -45,3 +55,9 @@ def sort_array_by_distance(points_array, point):
     sorted_indices = np.argsort(distances)
     sorted_points = points_array[sorted_indices]
     return sorted_points
+
+def find_agent(grid, agent_color=255):
+    positions = np.argwhere(grid == agent_color)
+    if positions.size == 0:
+        return None
+    return positions[0][::-1]  # return (x,y)

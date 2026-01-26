@@ -9,6 +9,8 @@ if __name__ == "__main__":
 from lib.grid_env.obst_grid_gen import is_in_grid
 from lib.utils import sort_array_by_distance
 
+
+
 class FrontierDetector:
     def __init__(self,
                  height,
@@ -30,9 +32,13 @@ class FrontierDetector:
         self.max_relative = max(height, width)
         self.max_distance = int(np.sqrt(height**2 + width**2))
 
-    def detect(self, obs_grid, agent_pos=np.array([0,0])):
+    def frontier_mixin_init(self, max_cluster_size):#sort_by='distance', 
+        self.max_cluster_size = max_cluster_size
+
+
+    def detect_frontiers(self, obs_grid, agent_pos=np.array([0,0])):
         frontiers = find_frontiers(obs_grid, self.free_color, self.unknown_color)
-        centroids, clusters = cluster_frontiers(frontiers, 
+        centroids, clusters, igain = cluster_frontiers(frontiers, 
                                                 max_cluster_size=self.max_cluster_size)
         if self.sorting:
             centroids = sort_array_by_distance(centroids, agent_pos)
@@ -45,7 +51,7 @@ class FrontierDetector:
             relative_centroids = centroids.copy()
             relative_distances = np.array([])
         self.centroids = centroids
-        self.pad_centroids = pad_obs_array(centroids, 
+        self.obs_centroids = pad_obs_array(centroids, 
                                        target_shape=(self.centroids_obs_len, 2))
         self.relative_centroids = pad_obs_array(relative_centroids, 
                                                 target_shape=(self.centroids_obs_len, 2),
@@ -54,7 +60,43 @@ class FrontierDetector:
                                                 target_shape=(self.centroids_obs_len,),
                                                 value=self.max_distance)
         self.clusters = clusters
+        self.info_gain = pad_obs_array( igain, 
+                                    target_shape=(self.centroids_obs_len,),
+                                    value=0)
 
+class FrontierMixin:
+    def frontier_init(self, max_cluster_size):#sort_by='distance', 
+        self.max_cluster_size = max_cluster_size
+    def detect_frontiers(self):
+        FrontierDetector.detect_frontiers(self, self.obs_grid, self.agent_pos)
+        
+    # def detect_frontiers(self):#, obs_grid, agent_pos=np.array([0,0])):
+    #     frontiers = find_frontiers(self.obs_grid, self.free_color, self.unknown_color)
+    #     centroids, clusters, igain = cluster_frontiers(frontiers, 
+    #                                             max_cluster_size=self.max_cluster_size)
+    #     if self.sorting:
+    #         centroids = sort_array_by_distance(centroids, self.agent_pos)
+    #         if self.reverse:
+    #             centroids = centroids[::-1]
+    #     if centroids.size > 0:
+    #         relative_centroids = centroids - self.agent_pos
+    #         relative_distances = np.linalg.norm(relative_centroids, axis=1)
+    #     else:
+    #         relative_centroids = centroids.copy()
+    #         relative_distances = np.array([])
+    #     self.centroids = centroids
+    #     self.obs_centroids = pad_obs_array(centroids, 
+    #                                    target_shape=(self.centroids_obs_len, 2))
+    #     self.relative_centroids = pad_obs_array(relative_centroids, 
+    #                                             target_shape=(self.centroids_obs_len, 2),
+    #                                             value=self.max_relative)
+    #     self.relative_distances = pad_obs_array(relative_distances, 
+    #                                             target_shape=(self.centroids_obs_len,),
+    #                                             value=self.max_distance)
+    #     self.clusters = clusters
+    #     self.info_gain = pad_obs_array( igain, 
+    #                                 target_shape=(self.centroids_obs_len,),
+    #                                 value=0)
 
 def find_frontiers(obs_grid, free_color, unknown_color):
     height, width = obs_grid.shape
@@ -99,9 +141,10 @@ def cluster_frontiers(frontiers, max_cluster_size=5):
                                     max_cluster_size=max_cluster_size)
         clusters.extend(subclusters)
 
+    igain = np.array([ a.shape[0] for a in clusters ])
     centroids = np.array([c.mean(axis=0) for c in clusters])
 
-    return centroids, clusters
+    return centroids, clusters, igain
 
 def split_clusters_list(clusters, max_cluster_size=5):
     splitted = []
@@ -153,7 +196,7 @@ def clusterify(group, max_cluster_size):
     return subclusters
 
 def pad_obs_array(array, target_shape=(10,2), value=0):
-    padded = np.full(target_shape, value, dtype=np.int64)
+    padded = np.full(target_shape, value, dtype=array.dtype)
     if array.size == 0:
         return padded
     
@@ -206,7 +249,7 @@ if __name__ == "__main__":
                         unknown_color=85,
                         max_cluster_size=15)
         
-        detector.detect(obs_grid, agent_pos=agent_pos)
+        detector.detect_frontiers(obs_grid, agent_pos=agent_pos)
         render(ax_fromscratch, obs_grid, detector.centroids, detector.clusters)
 
         plt.show()

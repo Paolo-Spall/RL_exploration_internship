@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 import numpy as np
 import matplotlib.pyplot as plt
-import random
 
-from sklearn import tree
+if __name__ == "__main__":
+    import sys
+    sys.path.append(".")
+from lib.frontier_exploration.planning.planning_utils import check_edge, random_point
 
 def rrt(grid, start, goal, free_code, connect_dist = 1, ed_length = 1.5, reverse=False, manhattan=False):
     
@@ -53,60 +55,7 @@ def rrt(grid, start, goal, free_code, connect_dist = 1, ed_length = 1.5, reverse
     #path.append(goal)
     return path, tree1, tree2
 
-def check_edge(grid, start, goal, free_code, reverse=False, manhattan=False):
-    while not np.array_equal(start, goal):
-        direction = goal - start
-        if manhattan:
-            move = manatthan_move(direction)
-        else:
-            move = np.sign(direction)
-        start += move
-        if acceptable_edge_move(grid, start[0], start[1], free_code, reverse=reverse) is False:
-            return False
-    return True           
 
-def straight_path(start, goal, manhattan=False):
-    path = []
-    while not np.array_equal(start, goal):
-        direction = goal - start
-        if manhattan:
-            move = manatthan_move(direction)
-        else:
-            move = np.sign(direction)
-        start += move
-        path.append(start.copy())
-
-    return path 
-
-def random_point(grid):
-    height, width = grid.shape
-    x = random.randint(0, width-1) 
-    y = random.randint(0, height-1)
-    while not is_in_grid(grid, x, y):
-        x = random.randint(0, width-1)
-        y = random.randint(0, height-1)
-    return np.array([x,y])
-
-def acceptable_edge_move(grid, new_x, new_y, free_code, reverse=False):
-        if not is_in_grid(grid, new_x, new_y):
-            return False
-        if not is_free(grid, new_x, new_y, free_code, reverse):
-            return False
-        return True
-    
-def is_in_grid(grid, x, y):
-    height, width = grid.shape
-    return 0 <= x < width and 0 <= y < height
-
-def is_obstacle(grid, x, y, obstacle_code, reverse=False):
-    if reverse:
-        return grid[x][y] == obstacle_code
-    return grid[y][x] == obstacle_code
-
-def is_free(grid, x, y, free_code, reverse=False):
-    if reverse:
-        return grid[x][y] == free_code
-    return grid[y][x] == free_code
 
 def render_rrt_path(grid, path, tree1, tree2, start, goal):
     #fig , (ax_env, ax_obs) = plt.subplots(1,2, figsize=(10,5))

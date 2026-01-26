@@ -1,4 +1,4 @@
-model_name: 'NewExplFrontStepEnv_relative_DQN_1e5'
+model_name: 'NewExplFrontStepEnv_distance_DQN_1e5'
 train: true
 model_class: 'DQN'
 env_class: 'NewExplFrontStepEnv'
@@ -12,12 +12,12 @@ env:
   target_discovery_percent: 0.9
   render_mode: null
   sorting: true
-  reverse: False
-  relative: true
-  
+  reverse: false
+  relative: false
+  distance: true
 
 model:
-  policy: MultiInputPolicy
+  policy: MlpPolicy
   device: cpu
   learning_rate: 0.0005
   batch_size: 64
