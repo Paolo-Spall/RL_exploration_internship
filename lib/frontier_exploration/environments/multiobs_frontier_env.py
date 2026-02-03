@@ -1,17 +1,17 @@
 #/usr/bin/python3
+import numpy as np
 
 if __name__ == "__main__":
     import sys
-    import numpy as np
-    from stable_baselines3.common.env_checker import check_env 
+    from stable_baselines3.common.env_checker import check_env
     
     sys.path.append(".")
-    
-from lib.frontier_exploration.environments.step_mixin import StepStraightMixin
-from lib.frontier_exploration.environments.multiobs_front_env_base import MultiObsFrontEnvBase
 
+from lib.frontier_exploration.environments.dynamics import StepMixin
+from lib.frontier_exploration.environments.multiobs_front_base import MultiObsFrontBase
+from lib.utils import step_toward
 
-class MultiObsFrontierEnv(StepStraightMixin, MultiObsFrontEnvBase):
+class MultiObsFrontierEnv(StepMixin, MultiObsFrontBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
@@ -19,6 +19,27 @@ class MultiObsFrontierEnv(StepStraightMixin, MultiObsFrontEnvBase):
         super().reset(seed=seed, *args, **kwargs)
         
         return self.mixin_reset()
+    
+    def step(self, action):
+        """action: index of the target centroid
+        """
+
+        # extracting the target centroid coordinates
+        target_centroid = np.array(self.obs_centroids[action].copy(), dtype=np.int64)
+
+        if np.all(target_centroid == self.padding_value):
+            obs, reward, terminated, truncated, info = super().step(self.agent_pos)
+            reward -= 1
+            truncated = True
+            return obs, reward, terminated, truncated, info
+        
+        # computing the next position toward the target centroid
+        next_pos = step_toward(self.agent_pos, target_centroid, manhattan=True)
+
+        if self.render_mode == "human":
+            print("Action: ", action, "Target centroid: ", target_centroid)
+
+        return super().step(next_pos)
 
 if __name__ == "__main__":
     width, height = 20, 20
@@ -28,9 +49,9 @@ if __name__ == "__main__":
     
     truncations = 0
     terminations = 0
-    for obs_type in ['distance']:#'relative', 'absolute', 'distance']:
-        for info_gain in [True]:#, True]:
-            for ag_pos in [False]:#, False]:
+    for obs_type in ['relative', 'absolute', 'distance']:#['relative', 'absolute', 'distance']:
+        for info_gain in [True, False]:# [True, False]
+            for ag_pos in [True, False]:# [True, False]
                 #print(f"Obs type: {obs_type}, Info gain: {info_gain}, Agent pos: {ag_pos}")
                 print("Creating environment...")
                 env = MultiObsFrontierEnv(  width=width, 
@@ -38,7 +59,7 @@ if __name__ == "__main__":
                                             obstacle_prob=obstacle_prob, 
                                             target_discovery_percent=target_discovery_percent,
                                             perc_range=perc_range, 
-                                            render_mode= "human",#None,
+                                            render_mode= "human", # "human", None,
                                             sorting=True,
                                             reverse=False,
                                             obs_spec={'type':obs_type,
@@ -60,14 +81,30 @@ if __name__ == "__main__":
                 trunc = False
 
                 while not term and not trunc:
-                    # centroids = obs['frontier_centroids'].reshape(-1,2)
-                    # agent_pos = obs['agent_position']
-                    # centroids = obs.reshape(-1,2)
-                    # action = greedy_index(centroids, env.agent_pos)#np.array([0,0]))
-                    c = np.stack((obs[::3],obs[1::3])).transpose()
-                    # action = np.argmin( np.linalg.norm(c , axis=1) )
-                    c = obs[::2]
-                    action = np.argmin( c )
+                    if ag_pos:
+                        centroids = obs['frontier_centroids']
+                    else:
+                        centroids = obs
+
+                    if info_gain:
+                        if obs_type in ['absolute', 'relative']:
+                            centroids = np.stack((centroids[::3],centroids[1::3])).transpose()
+                        else:
+                            centroids = centroids[::2]
+                    else:
+                        if obs_type in ['absolute', 'relative']:
+                            centroids = centroids.reshape((-1,2))
+
+
+                    
+                    if obs_type == 'distance':
+                        action = np.argmin( centroids )
+                    elif obs_type == 'absolute':
+                        action = np.argmin( np.linalg.norm( centroids - env.agent_pos , axis=1) )
+                    elif obs_type == 'relative':
+                        action = np.argmin( np.linalg.norm( centroids , axis=1) )
+                    
+                    #action = np.random.randint(0, len(centroids))
                     obs, reward, term,  trunc, _ = env.step(action)
 
                 if trunc:

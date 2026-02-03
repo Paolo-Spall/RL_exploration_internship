@@ -1,4 +1,4 @@
-from lib.train_utils import test_render_model
+from lib.rl_funcs import test_render_model
 import time
 import sys
 import yaml

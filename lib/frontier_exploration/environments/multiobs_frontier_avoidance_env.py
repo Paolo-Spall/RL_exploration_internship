@@ -7,13 +7,13 @@ if __name__ == "__main__":
     import sys
     sys.path.append(".")
     
-from lib.frontier_exploration.environments.multiobs_front_env_base import MultiObsFrontEnvBase
-from lib.frontier_exploration.environments.step_mixin import StepMixin
+from lib.frontier_exploration.environments.multiobs_front_base import MultiObsFrontBase
+from lib.frontier_exploration.environments.dynamics import StepMixin
 from lib.frontier_exploration.planning.obst_avoidance import ObstAvoidance
 from lib.utils import greedy_index, step_toward
     
     
-class MultiObsFrontAvoidanceEnv(StepMixin, MultiObsFrontEnvBase):
+class MultiObsFrontAvoidanceEnv(StepMixin, MultiObsFrontBase):
     moves = [np.array([1, 0]),   # Move right (positive x)
              np.array([0, 1]),   # Move up (positive y)
              np.array([-1, 0]),  # Move left (negative x)
@@ -34,7 +34,12 @@ class MultiObsFrontAvoidanceEnv(StepMixin, MultiObsFrontEnvBase):
 
         # extracting the target centroid coordinates
         target_centroid = np.array(self.obs_centroids[action].copy(), dtype=np.int64)
-
+        
+        if np.all(target_centroid == self.padding_value):
+            obs, reward, terminated, truncated, info = super().step(self.agent_pos)
+            reward -= 1
+            truncated = True
+            return obs, reward, terminated, truncated, info
         
 
         if self.avoidance.active(target_centroid):
@@ -54,7 +59,7 @@ class MultiObsFrontAvoidanceEnv(StepMixin, MultiObsFrontEnvBase):
                                               target_centroid)
             if self.avoidance.path is None:
                 obs, reward, terminated, truncated, info = super().step(self.agent_pos)
-                obs-=1
+                reward -= 1
                 truncated = True
                 return obs, reward, terminated, truncated, info
 
@@ -71,9 +76,9 @@ if __name__ == "__main__":
     
     truncations = 0
     terminations = 0
-    for obs_type in ['distance']:#'relative', 'absolute', 'distance']:
-        for info_gain in [True]:#, True]:
-            for ag_pos in [False]:#, False]:
+    for obs_type in ['relative', 'absolute', 'distance']:#['relative', 'absolute', 'distance']:
+        for info_gain in [True, False]:# [True, False]
+            for ag_pos in [True, False]:# [True, False]
                 #print(f"Obs type: {obs_type}, Info gain: {info_gain}, Agent pos: {ag_pos}")
                 print("Creating environment...")
                 env = MultiObsFrontAvoidanceEnv(  width=width, 
@@ -81,7 +86,7 @@ if __name__ == "__main__":
                                             obstacle_prob=obstacle_prob, 
                                             target_discovery_percent=target_discovery_percent,
                                             perc_range=perc_range, 
-                                            render_mode= "human",#None,
+                                            render_mode= None, # "human", None,
                                             sorting=True,
                                             reverse=False,
                                             obs_spec={'type':obs_type,
@@ -89,8 +94,8 @@ if __name__ == "__main__":
                                                     'i_gain':info_gain})
                 #for i in range(50):
 
-                # check_env(env, warn=True)
-                # print("Env checked.")
+                check_env(env, warn=True)
+                print("Env checked.")
                 # exit()
 
                 print("Resetting environment...")
@@ -103,14 +108,30 @@ if __name__ == "__main__":
                 trunc = False
 
                 while not term and not trunc:
-                    # centroids = obs['frontier_centroids'].reshape(-1,2)
-                    # agent_pos = obs['agent_position']
-                    # centroids = obs.reshape(-1,2)
-                    # action = greedy_index(centroids, env.agent_pos)#np.array([0,0]))
-                    c = np.stack((obs[::3],obs[1::3])).transpose()
-                    # action = np.argmin( np.linalg.norm(c , axis=1) )
-                    c = obs[::2]
-                    action = np.argmin( c )
+                    if ag_pos:
+                        centroids = obs['frontier_centroids']
+                    else:
+                        centroids = obs
+
+                    if info_gain:
+                        if obs_type in ['absolute', 'relative']:
+                            centroids = np.stack((centroids[::3],centroids[1::3])).transpose()
+                        else:
+                            centroids = centroids[::2]
+                    else:
+                        if obs_type in ['absolute', 'relative']:
+                            centroids = centroids.reshape((-1,2))
+
+
+                    
+                    if obs_type == 'distance':
+                        action = np.argmin( centroids )
+                    elif obs_type == 'absolute':
+                        action = np.argmin( np.linalg.norm( centroids - env.agent_pos , axis=1) )
+                    elif obs_type == 'relative':
+                        action = np.argmin( np.linalg.norm( centroids , axis=1) )
+                    
+                    #action = np.random.randint(0, len(centroids))
                     obs, reward, term,  trunc, _ = env.step(action)
 
                 if trunc:

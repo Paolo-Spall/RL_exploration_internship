@@ -54,7 +54,7 @@ class ObstGridAgentExplEnv(ObstGridAgentEnv):
     ## RENDERING FUNCTIONS
 
     def init_simulation_render(self):
-        self.fig , (self.ax_env, self.ax_obs) = plt.subplots(1,2, figsize=(10,5))
+        self.fig , (self.ax_env, self.ax_obs) = plt.subplots(1,2, figsize=(10, 5), dpi=48)
 
     def render(self):
         self.ax_env.clear()

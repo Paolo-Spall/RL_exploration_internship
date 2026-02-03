@@ -11,7 +11,7 @@ env:
   render_mode: null
   reverse: false
   sorting: true
-  target_discovery_percent: 0.7
+  target_discovery_percent: 0.9
   width: 20
 env_class: MultiObsFrontAvoidanceEnv
 model:

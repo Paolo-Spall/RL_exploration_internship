@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 class ObstGridEnv(gym.Env):
     """Environment representing a 2D grid with obstacles."""
-    metadata = {"render_modes": ["human"]}
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
     obstacle_color = 170  # Dark gray for obstacles
     unknown_color = 85  # Light gray for unknown cells
     agent_color = 255  # Black for agent position
@@ -30,7 +30,8 @@ class ObstGridEnv(gym.Env):
         self.discovered_cells = 0
 
 
-        if self.render_mode == "human":
+        if self.render_mode is not None:#== "human":
+            
             self.init_simulation_render()
 
     ## SETTING THE ENVIRONMENT GRID
@@ -103,7 +104,7 @@ class ObstGridEnv(gym.Env):
     ## RENDERING FUNCTIONS
 
     def init_simulation_render(self):
-        self.fig , self.ax_env = plt.subplots(1,1, figsize=(10,5))
+        self.fig , self.ax_env = plt.subplots(1,1, figsize=(10, 5), dpi=48)
 
     def render(self):
         self.ax_env.clear()

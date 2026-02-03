@@ -1,6 +1,7 @@
 #!/usrbin/python3
 import yaml
 import pprint
+import os
 
 filename = "config_new.yaml"
 filedir = "configs/"
@@ -15,6 +16,7 @@ for obs_type in [ 'absolute', 'relative','distance']:
         for ag_pos in [False, True]:
             config['env_class'] = "MultiObsFrontierEnv"
             config['env']['render_mode'] = None
+            config['env']['target_discovery_percent'] = 0.9
             config['env']['obs_spec'] = {'type': obs_type,
                                       'ag_pos': ag_pos,
                                       'i_gain': info_gain}
@@ -38,3 +40,15 @@ for obs_type in [ 'absolute', 'relative','distance']:
             model_name_list.append(model_name)
 print("Created config files for models:")
 pprint.pprint(model_name_list)
+
+script = "#!/usr/bin/bash\n"
+for model_name in model_name_list:
+    script += f"python3 script_train.py {model_name}\n"
+
+script_file = "run_all_models_0.sh"
+n=0
+while os.path.exists(script_file): 
+    script_file = f"run_all_models_{n}.sh"
+    n+=1
+with open(filedir + script_file, 'w') as outfile:
+    outfile.write(script)

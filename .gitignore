@@ -6,9 +6,11 @@ lib/fortier_exploration/configs/
 script_train_2.py
 configs/configfile_maker_2.py
 models/*
+try.py
 __pycache__/
 trash/
 *.pyc
 *.pyo
 *.pyd
 *.swp
+*.joblib

@@ -11,12 +11,10 @@ if __name__ == "__main__":
     
 from lib.grid_env.obst_grid_agent_expl_env import ObstGridAgentExplEnv
 from lib.frontier_exploration.frontiers import FrontierMixin
-from lib.frontier_exploration.environments.step_mixin import StepStraightMixin, StepMixin
-from lib.frontier_exploration.planning.obst_avoidance import ObstAvoidance
 from lib.utils import greedy_index, step_toward
 
 
-class MultiObsFrontEnvBase(FrontierMixin, ObstGridAgentExplEnv):
+class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
     """Base Class implementing a Gym environment for frontier-based exploration.
     Multiple inheritance:
       - ObstGridAgentExplEnv: base environment with agent and obstacle grid
@@ -50,12 +48,14 @@ class MultiObsFrontEnvBase(FrontierMixin, ObstGridAgentExplEnv):
                            'i_gain':False},
                  sorting=True,
                  reverse=False,
+                 padding_value=-999
                  ):
         
         super().__init__(perception_range=perc_range, 
                          width=width, 
                          height=height, 
-                         obstacle_prob=obstacle_prob)
+                         obstacle_prob=obstacle_prob,
+                         render_mode=render_mode)
         
         
         self.target_discovery_percent = target_discovery_percent
@@ -66,21 +66,25 @@ class MultiObsFrontEnvBase(FrontierMixin, ObstGridAgentExplEnv):
         self.sorting = sorting
         self.reverse = reverse
         self.obs_spec = obs_spec
-
+        self.padding_value = padding_value
+        
         self.total_cells = width * height
 
         self.max_relative = max(height, width)
         self.max_distance = int(np.sqrt(height**2 + width**2))
 
-        self.frontier_init(max_cluster_size=perc_range * 5)#sort_by='distance', 
+        ## FRONTIER ENGINE
+        max_front_cluster_size = perc_range * 5
+        self.frontier_init(max_cluster_size=max_front_cluster_size)#sort_by='distance', 
 
-        self.action_space = spaces.Discrete(centroids_obs_len)
-        
+        ## ACTION AND OBSERVATION SPACES
+        lowbound = -999
+        self.action_space = spaces.Discrete(centroids_obs_len)        
         if obs_spec['type'] in ['absolute', 'relative']:
-            if obs_spec['type'] == 'absolute':
-                lowbound = 0
-            else:
-                lowbound = -self.max_relative
+            # if obs_spec['type'] == 'absolute':
+            #     lowbound = 0
+            # else:
+            #     lowbound = -self.max_relative
             n = 3 if obs_spec['i_gain'] else 2
             self.observation_space = spaces.Box(low=lowbound, 
                                                 high=self.max_relative, 
@@ -89,7 +93,7 @@ class MultiObsFrontEnvBase(FrontierMixin, ObstGridAgentExplEnv):
 
         elif obs_spec['type'] == 'distance':
             n = 2 if obs_spec['i_gain'] else 1
-            self.observation_space = spaces.Box(low=0, 
+            self.observation_space = spaces.Box(low=lowbound, 
                                                 high=self.max_distance,
                                                 shape=(centroids_obs_len * n,),
                                                 dtype=np.float64)
@@ -104,8 +108,8 @@ class MultiObsFrontEnvBase(FrontierMixin, ObstGridAgentExplEnv):
                 'frontier_centroids': self.observation_space
             })
 
-        if self.render_mode == "human":
-            self.init_simulation_render()
+        # if self.render_mode == "human":
+        #     self.init_simulation_render()
 
     ## ENVIRONMENT DYNAMICS AND INTERACTION METHODS
 

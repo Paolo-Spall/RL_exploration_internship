@@ -8,6 +8,10 @@ from stable_baselines3.common.vec_env import VecTransposeImage
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.env_checker import check_env 
 
+import time
+from datetime import timedelta
+from time import perf_counter
+
 import yaml
 
 def checkenv_script(model_name):
@@ -17,7 +21,7 @@ def checkenv_script(model_name):
     
 
 def my_checkenv(env,config, model_name):
-    print(f"Checking environment for model: {model_name}")
+    print(f"\nChecking environment for model: {model_name}")
     #print(f"Enironment class: {config.get('env_class')}")
     check_env(env, warn=True)
     print("Environment check done.")
@@ -31,8 +35,6 @@ def open_config(model_name):
 
 def initialize_model(config):
 
-    model_name = config['model_name']
-
     ## TRAINING
     env_class_str = config.get('env_class')
     env_class = globals()[env_class_str]
@@ -41,26 +43,7 @@ def initialize_model(config):
     
     return env
 
-def train_model(model_name, check=False):
-    config_file = f"configs/config_{model_name}.yaml"
-
-    with open(config_file, 'r') as f:
-        config = yaml.safe_load(f)
-
-
-    model_name = config['model_name']
-
-
-    ## TRAINING
-    env_class_str = config.get('env_class')
-    env_class = globals()[env_class_str]
-
-
-    env = env_class(**config['env'])
-
-    if check:
-        my_checkenv(env,config, model_name)
-
+def wrap_model(env, config):
     env = Monitor(env)
     env = DummyVecEnv([lambda: env])
 
@@ -69,63 +52,96 @@ def train_model(model_name, check=False):
         env = VecTransposeImage(env)
 
     env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
+    return env
+
+
+
+def training_time_monitor(func):
+    def wrapper(*args, **kwargs):
+        timestr = time.strftime('%H:%M:%S %Y-%m-%d', time.localtime())
+        itime = perf_counter()
+        print(f"--- Starting at {timestr} ---")
+
+        model = func(*args, **kwargs)
+
+        elapsed = perf_counter() - itime
+        timestr = time.strftime('%H:%M:%S %Y-%m-%d', time.localtime())
+        print(f"--- Finishing at {timestr} ---")
+        formatted_time = time.strftime('%H:%M:%S', time.gmtime(elapsed))
+        print(f"Total Execution Time: {formatted_time} (HH:MM:SS)")
+        
+        return model, formatted_time
+    return wrapper
+
+@training_time_monitor
+def learn_model(model, total_timesteps):
+    model.learn(total_timesteps=total_timesteps )
+    return model
+
+def train_model(model_name, check=False):
+    config = open_config(model_name)
+    model_name = config['model_name']
+
+    env = initialize_model(config)
+    if check:
+        my_checkenv(env,config, model_name)
+    env = wrap_model(env, config)
 
     #env = TimeLimit(env, max_episode_steps=100)
 
+    #   CREATE RL MODEL
     class_str = config.get('model_class')
     model_class = globals()[class_str]
-
-    model = model_class(
-        env=env,
-        **config['model']
-    )
+    model = model_class( env=env, **config['model']  )
+    total_timesteps = config['training']['total_timesteps']
     
-    print(f"Training model: {model_name}")
+    print(f"\nTraining model: {model_name}")
+    model, training_time = learn_model(model, total_timesteps)
 
-    model.learn(total_timesteps=config['training']['total_timesteps'] )
+    # timestr = time.strftime('%H:%M:%S %Y-%m-%d', time.localtime())
+    # itime = perf_counter()
+    # print(f"\nTraining model: {model_name}")
+    # print(f"--- Starting at {timestr} ---")
 
+    # model.learn(total_timesteps=config['training']['total_timesteps'] )
+
+    # elapsed = perf_counter() - itime
+    # timestr = time.strftime('%H:%M:%S %Y-%m-%d', time.localtime())
+    # print(f"--- Finishing at {timestr} ---")
+    # formatted_time = time.strftime('%H:%M:%S', time.gmtime(elapsed))
+    # print(f"Total Execution Time: {formatted_time} (HH:MM:SS)")
 
     model.save("models/" + model_name)
     env.save(f"models/vec_normalize_{model_name}.pkl")
     env.close()
 
+    output_file = f"models/evaluation_{model_name}.txt"
+    with open(output_file, "w") as f:
+        f.write(f"Training time: {training_time}\n")
+    print(f"Evaluation results saved to {output_file}")
+    return training_time
+
     ## EVALUATION
 
 def evaluate_model(model_name, check=False):
-    config_file = f"configs/config_{model_name}.yaml"
-
-    with open(config_file, 'r') as f:
-        config = yaml.safe_load(f)
-
+    config = open_config(model_name)
 
     model_name = config['model_name']
-    print(f"Evaluating model: {model_name}")
+    print(f"\nEvaluating model: {model_name}")
 
-    env_class_str = config.get('env_class')
-    env_class = globals()[env_class_str]
+    eval_env = initialize_model(config)
 
-
-    eval_env = env_class(**config['env'])
-
+    ## compute Gymnasium environment check
     if check:
         my_checkenv(eval_env,config, model_name)
 
-    eval_env = Monitor(eval_env)
-    eval_env = DummyVecEnv([lambda: eval_env])
+    eval_env = wrap_model(eval_env, config)
 
-    if config.get('wrapper').get('VecTransposeImage'):
-    # If your env outputs HWC images, transpose to CHW for PyTorch
-        eval_env = VecTransposeImage(eval_env)
-
-    eval_env = VecNormalize.load(f"models/vec_normalize_{model_name}.pkl", eval_env)
-
-    #  do not update them at test time
-    eval_env.training = False
-    # reward normalization is not needed at test time
-    eval_env.norm_reward = False
-    # do not normalize observations at test time
-    eval_env.norm_obs = False
-
+    
+    eval_env.training = False    # does not update them at test time
+    eval_env.norm_reward = False # reward normalization is not needed at test time
+    eval_env.norm_obs = False    # does not normalize observations at test time
+    
     class_str = config.get('model_class')
     model_class = globals()[class_str]
 
@@ -136,25 +152,19 @@ def evaluate_model(model_name, check=False):
     print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
 
     output_file = f"models/evaluation_{model_name}.txt"
-    with open(output_file, "w") as f:
+    with open(output_file, "a") as f:
         f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")
     print(f"Evaluation results saved to {output_file}")
     return mean_reward, std_reward
 
 def test_render_model(model_name, check=False):
-    config_file = f"configs/config_{model_name}.yaml"
-
-    with open(config_file, 'r') as f:
-        config = yaml.safe_load(f)
+    config = open_config(model_name)
 
     config['env']['render_mode'] = 'human'
     model_name = config['model_name']
 
-    env_class_str = config.get('env_class')
-    env_class = globals()[env_class_str]
-
-
-    env = env_class(**config['env'])
+    env = initialize_model(config)
+    print(f"\nTesting rendering for model: {model_name}")
 
     if check:
         my_checkenv(env,config, model_name)
@@ -175,6 +185,7 @@ def test_render_model(model_name, check=False):
         
         obs, reward, done, truncated, _ = env.step(action)
         print(f"Step: {step}, Reward: {reward}, Done: {done}")
+        print(obs)
 
         #time.sleep(0.1)
 

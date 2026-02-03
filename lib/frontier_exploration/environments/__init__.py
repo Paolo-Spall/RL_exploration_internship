@@ -1,3 +1,2 @@
-from .new_expl_front_step_env import NewExplFrontStepEnv
 from .multiobs_frontier_env import MultiObsFrontierEnv
 from .multiobs_frontier_avoidance_env import MultiObsFrontAvoidanceEnv
