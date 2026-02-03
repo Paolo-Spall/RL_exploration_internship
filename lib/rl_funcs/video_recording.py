@@ -12,7 +12,7 @@ from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checke
 
 
 
-def record_model_render_video(
+def record_model_video(
 	model_name,
 	output_path="video.mp4",
 	max_steps=None,
@@ -81,7 +81,7 @@ def record_model_render_video(
 
 ## RENDER MODEL AND SAVE VIDEO USING VIDEOWRAPPER
 
-def test_render_model_videowrapper(model_name, check=False):
+def record_model_video_wrapper(model_name, check=False):
     """Render model and save video using VideoWrapper"""
     config = open_config(model_name)
 

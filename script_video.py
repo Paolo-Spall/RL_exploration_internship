@@ -1,54 +1,60 @@
-from lib.rl_funcs.learn_utils import get_policy_class, initialize_env,  wrap_model, my_checkenv, open_config
-# from lib.rl_funcs.test_render_model import one_step_frame
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from functools import partial
+import sys
 
-def one_step_frame(frame, ax, obs, env, model):
-    # if frame == 0:
-    #     print("if true")
-    #     obs, _ = env.reset()
-    # else:
-        # print("else true")
-    action, _ = model.predict(obs, deterministic=True)
+from lib.rl_funcs.learn_utils import training_time_monitor
+from lib.rl_funcs.video_recording import record_model_video, record_model_video_wrapper
+
+
+if len(sys.argv) > 1:
+    model_names = sys.argv[1:]
+else:
+     model_names = ['MultiObsFrontAvoidanceEnv_absolute_agent_DQN_1e5']
+#      ['MultiObsFrontierEnv_absolute_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_absolute_agent_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_absolute_DQN_1e5',
+#  'MultiObsFrontierEnv_absolute_agent_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_agent_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_agent_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_agent_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_agent_DQN_1e5']
+
+# model_names = ['MultiObsFrontAvoidanceEnv_absolute_iGain_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_absolute_agent_iGain_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_absolute_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_absolute_agent_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_relative_iGain_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_relative_agent_iGain_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_relative_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_relative_agent_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_distance_iGain_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_distance_agent_iGain_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_distance_DQN_1e5',
+#  'MultiObsFrontAvoidanceEnv_distance_agent_DQN_1e5']
     
-    obs, reward, done, truncated, _ = env.step(action)
-    ax = [env.ax_env, env.ax_obs]
-    if done or truncated:
-        return None
-    return ax, obs, env, model
+#    model_names =['MultiObsFrontierEnv_absolute_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_absolute_agent_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_absolute_DQN_1e5',
+#  'MultiObsFrontierEnv_absolute_agent_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_agent_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_agent_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_agent_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_agent_DQN_1e5']
 
-model_name = "MultiObsFrontAvoidanceEnv_relative_iGain_DQN_1e5"
-model_name = "MultiObsFrontierEnv_relative_iGain_DQN_1e5"
-check = True
 
-config = open_config(model_name)
-
-config['env']['render_mode'] = 'human'
-model_name = config['model_name']
-
-env = initialize_env(config)
-print(f"\nTesting rendering for model: {model_name}")
-
-# if check:
-#     my_checkenv(env, model_name)
-
-model_class = get_policy_class(config)
-
-print("Loading trained model...")
-# Force CPU to avoid CUDA driver/runtime issues when loading the model
-model = model_class.load(f"models/{model_name}", env=env, device="cpu")
-print("Model loaded.")
-
-fig = env.fig
-ax1 = env.ax_env
-ax2 = env.ax_obs
-ax = [ax1, ax2]
-obs, _ = env.reset()
-
-anim = FuncAnimation(fig, partial(one_step_frame, ax=ax, obs=obs, env=env, model=model), #scatter=scat), 
-                            frames=env.max_steps, 
-                            blit=False,
-                            repeat=False )
-anim.save("video.mp4")
-# plt.show()
+for model_name in model_names:
+    training_time_monitor(record_model_video)(
+		model_name,
+		output_path="video.mp4",
+		max_steps=None,
+		fps=4,
+		deterministic=True,
+		check=False,
+	)
+    
