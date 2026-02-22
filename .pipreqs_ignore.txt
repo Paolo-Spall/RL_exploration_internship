@@ -1,0 +1,1 @@
+pipreqs --ignore .venv/ .gitignore ./models/ ./portation/ ./configs/ ./trash/ ./PROJECT_STRUCTURE.md ./lib/free_RL_exploration/models/ ./lib/free_RL_exploration/configs/ ./lib/frontier_exploration/models/ ./lib/frontier_exploration/models/ ./lib/frontier_exploration/configs/ .pipreqs_ignore.txt

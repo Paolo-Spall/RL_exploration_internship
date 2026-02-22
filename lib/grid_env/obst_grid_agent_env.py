@@ -1,7 +1,6 @@
 #/usr/bin/python3
 
 import numpy as np
-import random
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
@@ -37,11 +36,11 @@ class ObstGridAgentEnv(ObstGridEnv):
 
     def init_agent_position(self):
         """initialize agent position randomly in an acceptable cell"""
-        x = random.randint(0, self.width-1) 
-        y = random.randint(0, self.height-1)
+        x = self.np_random.integers(0, self.width) 
+        y = self.np_random.integers(0, self.height)
         while not self.acceptable_move(x, y):
-            x = random.randint(0, self.width-1)
-            y = random.randint(0, self.height-1)
+            x = self.np_random.integers(0, self.width)
+            y = self.np_random.integers(0, self.height)
         self.set_agent_position(x, y)
 
     def set_agent_position(self, x, y):
@@ -74,7 +73,7 @@ if __name__ == "__main__":
                     )
 
     print("Resetting environment...")
-    env.reset()
+    env.reset(seed=42)
     env.update_obs_grid()
     print("Rendering the environment...")
     env.render()

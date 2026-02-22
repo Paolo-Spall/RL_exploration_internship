@@ -19,6 +19,7 @@ def record_model_video(
 	fps=10,
 	deterministic=True,
 	check=False,
+    seed=None
 ):
 	"""Record and save a video of the environment rendering for a trained model.
 
@@ -52,7 +53,7 @@ def record_model_video(
 			env.init_simulation_render()
 
 	fig = env.fig
-	obs, _ = env.reset()
+	obs, _ = env.reset(seed=seed)
 	
 
 	#total_steps = max_steps if max_steps is not None else getattr(env, "max_steps", 250)
@@ -81,7 +82,7 @@ def record_model_video(
 
 ## RENDER MODEL AND SAVE VIDEO USING VIDEOWRAPPER
 
-def record_model_video_wrapper(model_name, check=False):
+def record_model_video_wrapper(model_name, check=False, seed=None):
     """Render model and save video using VideoWrapper"""
     config = open_config(model_name)
 
@@ -102,7 +103,7 @@ def record_model_video_wrapper(model_name, check=False):
     model = model_class.load(f"models/{model_name}", env=env, device="cpu")
     print("Model loaded.")
 
-    obs, _ = env.reset()
+    obs, _ = env.reset(seed=seed)
 
     print("Starting exploration...")
     for step in range(300):

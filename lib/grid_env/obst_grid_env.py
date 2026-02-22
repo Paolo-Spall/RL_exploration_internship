@@ -1,7 +1,6 @@
 #/usr/bin/python3
 import gymnasium as gym
 import numpy as np
-import random
 import matplotlib.pyplot as plt
 
 
@@ -39,7 +38,7 @@ class ObstGridEnv(gym.Env):
         self.grid = np.ones((self.height, self.width), dtype=np.uint8) * self.free_color  # start with all free cells
         for y in range(self.height):
             for x in range(self.width):
-                if random.random() < self.obstacle_prob:
+                if self.np_random.random() < self.obstacle_prob:
                     self.make_obstacle(x,y)  # 1 represents an obstacle
     
     def _generate_obs_grid(self):
@@ -49,7 +48,7 @@ class ObstGridEnv(gym.Env):
     def make_obstacle(self, x, y):
         self.grid[y][x] = 1
         max_obstacle_size = min(self.width, self.height) // 5
-        obstacle_size = random.randint(max_obstacle_size//2, max_obstacle_size)
+        obstacle_size = self.np_random.integers(max_obstacle_size//2, max_obstacle_size+1)
         for i in range(obstacle_size):
             xnew,ynew = self.next_obst_cell(x,y)
 
@@ -66,7 +65,7 @@ class ObstGridEnv(gym.Env):
             x,y = xnew,ynew
     
     def next_obst_cell(self, x,y):
-        move = random.randint(0,3)
+        move = self.np_random.integers(0,4)
         if move == 0:
             x += 1
         elif move == 1:
@@ -80,6 +79,7 @@ class ObstGridEnv(gym.Env):
     ## ENVIRONMENT DYNAMICS AND INTERACTION METHODS
 
     def reset(self, seed=None, options=None):
+        super().reset(seed=seed)
         self._generate_grid()
 
     
@@ -123,7 +123,7 @@ if __name__ == "__main__":
                     )
 
     print("Resetting environment...")
-    env.reset()
+    env.reset(seed=42)
     print("Rendering the environment...")
     env.render()
     plt.show()

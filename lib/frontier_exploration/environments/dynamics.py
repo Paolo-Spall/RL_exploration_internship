@@ -1,6 +1,5 @@
 #/usr/bin/python3
 import numpy as np
-import random
 import matplotlib.pyplot as plt
 if __name__ == "__main__":
     import sys
@@ -46,7 +45,7 @@ class StepMixin:
             discovered_cells = self.update_obs_grid()
             if discovered_cells == 0:
                 # small penalty for no new discovery
-                reward -= 1. / self.total_cells 
+                reward -= 2.* self.perception_range / self.total_cells 
             else:
                 self.detect_frontiers()
 

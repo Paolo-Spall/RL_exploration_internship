@@ -49,6 +49,9 @@ else:
 
 
 for model_name in model_names:
+    training_time_monitor(record_model_video_wrapper)(
+		model_name,	seed=42)
+    
     training_time_monitor(record_model_video)(
 		model_name,
 		output_path="video.mp4",
@@ -56,5 +59,6 @@ for model_name in model_names:
 		fps=4,
 		deterministic=True,
 		check=False,
+        seed=42
 	)
     
