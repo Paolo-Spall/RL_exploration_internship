@@ -4,7 +4,6 @@ lib/free_RL_exploration/old/
 lib/fortier_exploration/models/
 lib/fortier_exploration/configs/
 script_train_2.py
-configs/configfile_maker_2.py
 models/*
 try.py
 __pycache__/
