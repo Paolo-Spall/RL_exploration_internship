@@ -7,8 +7,10 @@ import os
 
 def play_sound(file_path):
     # aplay is built into Ubuntu
-    subprocess.run(["aplay", "-q", file_path], stdout=subprocess.DEVNULL)
-
+    try:
+        subprocess.run(["aplay", "-q", file_path], stdout=subprocess.DEVNULL)
+    except Exception as e:
+        pass  # If sound playback fails, just ignore it
 
 if len(sys.argv) > 1:
     model_names = sys.argv[1:]
