@@ -2,7 +2,6 @@ lib/free_RL_exploration/models/
 lib/free_RL_exploration/configs/
 lib/free_RL_exploration/old/
 lib/fortier_exploration/models/
-lib/fortier_exploration/configs/
 script_train_2.py
 models/*
 try.py
