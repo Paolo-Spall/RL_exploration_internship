@@ -7,7 +7,7 @@ if __name__ == "__main__":
     sys.path.append(".")
 
 from lib.grid_env.obst_grid_gen import is_in_grid
-from lib.utils import sort_array_by_distance
+from lib.utils import argsort_by_distance
 
 
 
@@ -49,7 +49,9 @@ class FrontierDetector:
         centroids, clusters, igain = cluster_frontiers(frontiers, 
                                                 max_cluster_size=self.max_cluster_size)
         if self.sorting:
-            centroids = sort_array_by_distance(centroids, agent_pos)
+            argsort = argsort_by_distance(centroids, agent_pos)
+            centroids = centroids[argsort]
+            igain = igain[argsort]
             if self.reverse:
                 centroids = centroids[::-1]
         if centroids.size > 0:

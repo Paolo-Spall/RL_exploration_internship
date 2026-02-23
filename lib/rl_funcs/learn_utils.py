@@ -14,7 +14,7 @@ from stable_baselines3 import DQN, PPO
 from lib.frontier_exploration.environments import MultiObsFrontierEnv, \
                                                   MultiObsFrontAvoidanceEnv
 
-
+# decorator to monitor function time
 def training_time_monitor(func):
     def wrapper(*args, **kwargs):
         print()

@@ -49,9 +49,9 @@ if __name__ == "__main__":
     
     truncations = 0
     terminations = 0
-    for obs_type in ['relative', 'absolute', 'distance']:#['relative', 'absolute', 'distance']:
-        for info_gain in [True, False]:# [True, False]
-            for ag_pos in [True, False]:# [True, False]
+    for obs_type in ['distance']:#['relative', 'absolute', 'distance']:
+        for info_gain in [False]:# [True, False]
+            for ag_pos in [False]:# [True, False]
                 #print(f"Obs type: {obs_type}, Info gain: {info_gain}, Agent pos: {ag_pos}")
                 print("Creating environment...")
                 env = MultiObsFrontierEnv(  width=width, 
@@ -98,6 +98,8 @@ if __name__ == "__main__":
 
                     
                     if obs_type == 'distance':
+                        mask = centroids == env.padding_value
+                        centroids[mask] = np.inf
                         action = np.argmin( centroids )
                     elif obs_type == 'absolute':
                         action = np.argmin( np.linalg.norm( centroids - env.agent_pos , axis=1) )

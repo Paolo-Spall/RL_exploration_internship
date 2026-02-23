@@ -56,6 +56,14 @@ def sort_array_by_distance(points_array, point):
     sorted_points = points_array[sorted_indices]
     return sorted_points
 
+def argsort_by_distance(points_array, point):
+    if len(points_array) == 0:
+        return points_array
+    distances = np.linalg.norm(points_array - point, axis=1)
+    sorted_indices = np.argsort(distances)
+    
+    return sorted_indices
+
 def find_agent(grid, agent_color=255):
     positions = np.argwhere(grid == agent_color)
     if positions.size == 0:
