@@ -14,3 +14,4 @@ trash/
 *.joblib
 venv/
 .venv/
+video

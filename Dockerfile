@@ -12,6 +12,6 @@ COPY . .
 RUN apt-get update && apt-get install -y python3
 
 # Install Python Application Requirements
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 CMD ["mkdir", "models"]
