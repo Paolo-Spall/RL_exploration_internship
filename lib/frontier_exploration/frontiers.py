@@ -48,13 +48,16 @@ class FrontierDetector:
         frontiers = find_frontiers(obs_grid, self.free_color, self.unknown_color)
         centroids, clusters, igain = cluster_frontiers(frontiers, 
                                                 max_cluster_size=self.max_cluster_size)
-        if self.sorting:
-            argsort = argsort_by_distance(centroids, agent_pos)
-            centroids = centroids[argsort]
-            igain = igain[argsort]
-            if self.reverse:
-                centroids = centroids[::-1]
+        
         if centroids.size > 0:
+            if self.sorting:
+                argsort = argsort_by_distance(centroids, agent_pos)
+                centroids = centroids[argsort]
+                igain = igain[argsort]
+                if self.reverse:
+                    centroids = centroids[::-1]
+                    igain = igain[::-1]
+        
             relative_centroids = centroids - agent_pos
             relative_distances = np.linalg.norm(relative_centroids, axis=1)
         else:
