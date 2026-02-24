@@ -1,17 +1,10 @@
-# Use an official base image
-FROM ubuntu:latest
+FROM python:3.10-slim
 
 WORKDIR /app
 
 COPY requirements.txt .
-#RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-
-# Install dependencies
-RUN apt-get update && apt-get install -y python3
-
-# Install Python Application Requirements
-RUN pip install -r requirements.txt
 
 CMD ["mkdir", "models"]
