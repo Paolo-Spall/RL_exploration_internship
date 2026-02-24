@@ -29,7 +29,7 @@ model_class: DQN
 model_name: MultiObsFrontAvoidanceEnv_relative_DQN_1e5
 train: true
 training:
-  total_timesteps: 1000000
+  total_timesteps: 1000
 wrapper:
   VecNormalize:
     norm_obs: true
