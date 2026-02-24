@@ -31,7 +31,7 @@ def run_greedy(env, max_steps, heuristic="distance"):
 
     return tot_reward
 
-def evaluate_heuristic(model_name, n_episodes ,check=False, heuristic="distance", render=False):
+def evaluate_heuristic(model_name, n_episodes=30 ,check=False, heuristic="distance", render=False):
     config = open_config(model_name)
     config['obs_spec'] = {"ag_pos": False,
                           "i_gain": True,

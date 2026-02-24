@@ -32,7 +32,7 @@ def evaluate_model(model_name, check=False):
 
     model = model_class.load(f"models/{model_name}", env=eval_env, device="cpu")
 
-    mean_reward, std_reward = evaluate_policy(model, eval_env)
+    mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=30)
 
     eval_env.close()
 
