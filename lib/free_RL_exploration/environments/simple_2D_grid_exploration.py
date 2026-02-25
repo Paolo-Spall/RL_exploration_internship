@@ -80,6 +80,7 @@ class Simple2DGridExploration(gym.Env):
         return False
     
     def grid_explored(self):
+        pass
 
     def step(self, action):
         reward = 0.0

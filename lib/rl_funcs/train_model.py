@@ -15,6 +15,7 @@ def train_model(model_name, check=False):
     env = initialize_env(config)
     if check:
         my_checkenv(env, model_name)
+    
     env = wrap_model(env, config)
 
     #env = TimeLimit(env, max_episode_steps=100)
@@ -29,7 +30,10 @@ def train_model(model_name, check=False):
     model, training_time = learn_model(model, total_timesteps)
 
     model.save("models/" + model_name)
-    env.save(f"models/vec_normalize_{model_name}.pkl")
+    
+    if config.get('wrapper'):
+        if config['wrapper'].get('VecNormalize'):
+            env.save(f"models/vec_normalize_{model_name}.pkl")
     env.close()
 
     output_file = f"models/evaluation_{model_name}.txt"

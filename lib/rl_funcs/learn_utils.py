@@ -10,9 +10,10 @@ import time
 from time import perf_counter
 
 from stable_baselines3 import DQN, PPO
-#from lib.free_RL_exploration.environments import ExpGrid2D, Simple2DGrid, Simple2DGridObs, Simple2DGridMultiObs
+from lib.free_RL_exploration.environments import SimpleTargetAgentEnv
 from lib.frontier_exploration.environments import MultiObsFrontierEnv, \
                                                   MultiObsFrontAvoidanceEnv
+
 
 # decorator to monitor function time
 def training_time_monitor(func):
@@ -67,6 +68,8 @@ def initialize_env(config):
     return env
 
 def wrap_model(env, config):
+    if config.get('wrapper') == None:
+        return env
     env = Monitor(env)
     env = DummyVecEnv([lambda: env])
 

@@ -58,7 +58,11 @@ class ObstGridAgentEnv(ObstGridEnv):
     def render(self):
         self.ax_env.clear()
         
-        self.ax_env.imshow(self.obs_grid, cmap='Greys', vmin=self.min_color, vmax=self.max_color)#, origin='upper', vmin=0, vmax=255)
+        self.ax_env.imshow(self.obs_grid, 
+                           cmap='Greys', 
+                           vmin=self.min_color, 
+                           vmax=self.max_color,
+                           origin='lower')#, origin='upper', vmin=0, vmax=255)
 
 
 

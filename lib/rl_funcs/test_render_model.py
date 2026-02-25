@@ -32,8 +32,9 @@ def test_render_model(model_name, check=False):
     print("Starting exploration...")
     for step in range(300):
         action, _ = model.predict(obs, deterministic=True)
+        intaction = int(action)
         
-        obs, reward, done, truncated, _ = env.step(action)
+        obs, reward, done, truncated, _ = env.step(intaction)
         print(f"Step: {step}, Reward: {reward}, Done: {done}")
 
         #time.sleep(0.1)
