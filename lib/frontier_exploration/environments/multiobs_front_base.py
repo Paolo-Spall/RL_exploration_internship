@@ -70,21 +70,25 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
         
         self.total_cells = width * height
 
-        self.max_relative = max(height, width)
-        self.max_distance = int(np.sqrt(height**2 + width**2))
+        
 
         ## FRONTIER ENGINE
         max_front_cluster_size = perc_range * 5
         self.frontier_init(max_cluster_size=max_front_cluster_size)#sort_by='distance', 
 
+        self.max_relative = max(height, width, self.padding_value)
+        self.max_distance = max(int(np.sqrt(height**2 + width**2)), self.padding_value) 
+        if self.obs_spec['i_gain']:
+            self.max_relative = max(self.max_relative, max_front_cluster_size)
+            self.max_distance = max(self.max_distance, max_front_cluster_size)
+
         ## ACTION AND OBSERVATION SPACES
-        lowbound = self.padding_value
+        lowbound = min(0, self.padding_value)
+        
         self.action_space = spaces.Discrete(centroids_obs_len)        
         if obs_spec['type'] in ['absolute', 'relative']:
-            # if obs_spec['type'] == 'absolute':
-            #     lowbound = 0
-            # else:
-            #     lowbound = -self.max_relative
+            if obs_spec['type'] == 'relative':
+                lowbound = min(-self.max_relative, self.padding_value)
             n = 3 if obs_spec['i_gain'] else 2
             self.observation_space = spaces.Box(low=lowbound, 
                                                 high=self.max_relative, 
