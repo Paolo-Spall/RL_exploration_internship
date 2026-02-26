@@ -20,6 +20,7 @@ for obs_type in [ 'absolute', 'relative','distance']:
             config['env']['obs_spec'] = {'type': obs_type,
                                       'ag_pos': ag_pos,
                                       'i_gain': info_gain}
+            #del config['env']['seed']
             model_name = "MultiObsFrontierEnv_"
             model_name += f"{obs_type}_"
             if ag_pos:

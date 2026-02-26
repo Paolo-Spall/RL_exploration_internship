@@ -67,7 +67,7 @@ def initialize_env(config):
     
     return env
 
-def wrap_model(env, config):
+def wrap_model(env, config, model_name=None, evaluation=False):
     if config.get('wrapper') == None:
         return env
     env = Monitor(env)
@@ -76,6 +76,9 @@ def wrap_model(env, config):
     if config.get('wrapper').get('VecTransposeImage'):
     # If your env outputs HWC images, transpose to CHW for PyTorch
         env = VecTransposeImage(env)
-
-    env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
+    
+    if evaluation:
+        env = VecNormalize.load(f"models/vec_normalize_{model_name}.pkl", env)
+    else:
+        env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
     return env

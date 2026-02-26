@@ -47,7 +47,7 @@ class FrontierDetector:
         
         frontiers = find_frontiers(obs_grid, self.free_color, self.unknown_color)
         centroids, clusters, igain = cluster_frontiers(frontiers, 
-                                                max_cluster_size=self.max_cluster_size)
+                                                       max_cluster_size=self.max_cluster_size)
         
         if centroids.size > 0:
             if self.sorting:

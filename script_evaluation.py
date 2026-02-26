@@ -20,13 +20,13 @@ else:
  'MultiObsFrontierEnv_absolute_iGain_DQN_1e5',
  'MultiObsFrontierEnv_absolute_agent_iGain_DQN_1e5',
  'MultiObsFrontierEnv_relative_DQN_1e5',
- 'MultiObsFrontierEnv_relative_agent_DQN_1e5',
- 'MultiObsFrontierEnv_relative_iGain_DQN_1e5',
- 'MultiObsFrontierEnv_relative_agent_iGain_DQN_1e5',
- 'MultiObsFrontierEnv_distance_DQN_1e5',
- 'MultiObsFrontierEnv_distance_agent_DQN_1e5',
-'MultiObsFrontierEnv_distance_iGain_DQN_1e5',
- 'MultiObsFrontierEnv_distance_agent_iGain_DQN_1e5']
+ 'MultiObsFrontierEnv_relative_agent_DQN_1e5',]
+#  'MultiObsFrontierEnv_relative_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_relative_agent_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_agent_DQN_1e5',
+# 'MultiObsFrontierEnv_distance_iGain_DQN_1e5',
+#  'MultiObsFrontierEnv_distance_agent_iGain_DQN_1e5']
  
 #     model_names = [
 #  'MultiObsFrontAvoidanceEnv_absolute_DQN_1e5',

@@ -15,7 +15,20 @@ def play_sound(file_path):
 if len(sys.argv) > 1:
     model_names = sys.argv[1:]
 else:
-    model_names = ['SimpleTargetAgentEnv_01',]
+    model_names = ['MultiObsFrontierEnv_absolute_DQN_1e5',
+ 'MultiObsFrontierEnv_absolute_agent_DQN_1e5',
+ 'MultiObsFrontierEnv_absolute_iGain_DQN_1e5',
+ 'MultiObsFrontierEnv_absolute_agent_iGain_DQN_1e5',
+ 'MultiObsFrontierEnv_relative_DQN_1e5',
+ 'MultiObsFrontierEnv_relative_agent_DQN_1e5',
+ 'MultiObsFrontierEnv_relative_iGain_DQN_1e5',
+ 'MultiObsFrontierEnv_relative_agent_iGain_DQN_1e5',
+ 'MultiObsFrontierEnv_distance_DQN_1e5',
+ 'MultiObsFrontierEnv_distance_agent_DQN_1e5',
+'MultiObsFrontierEnv_distance_iGain_DQN_1e5',
+ 'MultiObsFrontierEnv_distance_agent_iGain_DQN_1e5']
+
+#    model_names = ['SimpleTargetAgentEnv_01',]
 #     model_names = [
 #  #'MultiObsFrontAvoidanceEnv_absolute_DQN_1e5',
 #  'MultiObsFrontAvoidanceEnv_absolute_agent_DQN_1e5',
@@ -30,18 +43,7 @@ else:
 #  'MultiObsFrontAvoidanceEnv_distance_iGain_DQN_1e5',]
 #  #'MultiObsFrontAvoidanceEnv_distance_agent_iGain_DQN_1e5']
 
-#     model_names = ['MultiObsFrontierEnv_absolute_DQN_1e5',
-#  'MultiObsFrontierEnv_absolute_agent_DQN_1e5',
-#  'MultiObsFrontierEnv_absolute_iGain_DQN_1e5',
-#  'MultiObsFrontierEnv_absolute_agent_iGain_DQN_1e5',
-#  'MultiObsFrontierEnv_relative_DQN_1e5',
-#  'MultiObsFrontierEnv_relative_agent_DQN_1e5',]
-#  'MultiObsFrontierEnv_relative_iGain_DQN_1e5',
-#  'MultiObsFrontierEnv_relative_agent_iGain_DQN_1e5',
-#  'MultiObsFrontierEnv_distance_DQN_1e5',
-#  'MultiObsFrontierEnv_distance_agent_DQN_1e5',
-# 'MultiObsFrontierEnv_distance_iGain_DQN_1e5',
-#  'MultiObsFrontierEnv_distance_agent_iGain_DQN_1e5']
+#     
  
 
 table_file = "models/evaluation_results_0.txt"
@@ -75,7 +77,7 @@ for model_name in model_names:
             fps=4,
             deterministic=True,
             check=False,
-            seed=42
+            seed=0
         )
     else:
         print("Skipping video recording as per user request.")

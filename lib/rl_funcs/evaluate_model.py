@@ -21,7 +21,7 @@ def evaluate_model(model_name, check=False):
     if check:
         my_checkenv(eval_env, model_name)
 
-    eval_env = wrap_model(eval_env, config)
+    eval_env = wrap_model(eval_env, config, model_name=model_name, evaluation=True)
     
     eval_env.training = False    # does not update them at test time
     eval_env.norm_reward = False # reward normalization is not needed at test time
