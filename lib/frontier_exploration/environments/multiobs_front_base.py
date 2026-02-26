@@ -48,7 +48,7 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
                            'i_gain':False},
                  sorting=True,
                  reverse=False,
-                 padding_value=-1e-6 # value to fill observation arrays when the n of clusters < centroids_obs_len
+                 padding_value=-1 # value to fill observation arrays when the n of clusters < centroids_obs_len
                  ):
         
         super().__init__(perception_range=perc_range, 
