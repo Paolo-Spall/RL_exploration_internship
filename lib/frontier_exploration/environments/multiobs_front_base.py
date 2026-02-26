@@ -48,7 +48,7 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
                            'i_gain':False},
                  sorting=True,
                  reverse=False,
-                 padding_value=-999
+                 padding_value=-1e-6 # value to fill observation arrays when the n of clusters < centroids_obs_len
                  ):
         
         super().__init__(perception_range=perc_range, 
@@ -78,7 +78,7 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
         self.frontier_init(max_cluster_size=max_front_cluster_size)#sort_by='distance', 
 
         ## ACTION AND OBSERVATION SPACES
-        lowbound = -999
+        lowbound = self.padding_value
         self.action_space = spaces.Discrete(centroids_obs_len)        
         if obs_spec['type'] in ['absolute', 'relative']:
             # if obs_spec['type'] == 'absolute':
