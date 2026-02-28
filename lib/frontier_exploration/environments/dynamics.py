@@ -45,9 +45,10 @@ class StepMixin:
             discovered_cells = self.update_obs_grid()
             if discovered_cells == 0:
                 # small penalty for no new discovery
-                reward -= 2.* self.perception_range / self.total_cells 
+                reward -= 2.* self.perception_range / self.total_cells
+                self.detect_frontiers(changed = False) 
             else:
-                self.detect_frontiers()
+                self.detect_frontiers(changed = True)
 
                 # reward proportional to new discovered cells
                 reward += discovered_cells / self.total_cells  

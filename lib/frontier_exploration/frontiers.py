@@ -36,7 +36,7 @@ class FrontierDetector:
         self.max_cluster_size = max_cluster_size
 
 
-    def detect_frontiers(self, obs_grid, agent_pos=np.array([0,0])):
+    def detect_frontiers(self, obs_grid, agent_pos=np.array([0,0]), changed=True):
         """Method that actually detect and organizes frontiers:
         - Finds frontiers in the observed grid
         - Clusters them
@@ -45,10 +45,15 @@ class FrontierDetector:
         - computes information gain
         - Sorts and pads centroids arrays"""
         
-        frontiers = find_frontiers(obs_grid, self.free_color, self.unknown_color)
-        centroids, clusters, igain = cluster_frontiers(frontiers, 
-                                                       max_cluster_size=self.max_cluster_size)
-        
+        if changed:
+            frontiers = find_frontiers(obs_grid, self.free_color, self.unknown_color)
+            centroids, clusters, igain = cluster_frontiers(frontiers, 
+                                                        max_cluster_size=self.max_cluster_size)
+        else:
+            centroids = self.centroids
+            clusters = self.clusters
+            igain = self.info_gain
+
         if centroids.size > 0:
             if self.sorting:
                 argsort = argsort_by_distance(centroids, agent_pos)
@@ -81,8 +86,11 @@ class FrontierDetector:
 class FrontierMixin:
     def frontier_init(self, max_cluster_size):#sort_by='distance', 
         self.max_cluster_size = max_cluster_size
-    def detect_frontiers(self):
-        FrontierDetector.detect_frontiers(self, self.obs_grid, self.agent_pos)
+    def detect_frontiers(self, changed = True):
+        FrontierDetector.detect_frontiers(self, 
+                                          self.obs_grid, 
+                                          self.agent_pos,
+                                          changed = changed)
  
 def find_frontiers(obs_grid, free_color, unknown_color):
     height, width = obs_grid.shape
