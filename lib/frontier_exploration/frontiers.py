@@ -50,14 +50,17 @@ class FrontierDetector:
             centroids, clusters, igain = cluster_frontiers(frontiers, 
                                                         max_cluster_size=self.max_cluster_size)
         else:
+            num_centroids = self.centroids.shape[0]
+
             centroids = self.centroids
             clusters = self.clusters
-            igain = self.info_gain
+            igain = self.info_gain[:num_centroids]
 
         if centroids.size > 0:
             if self.sorting:
                 argsort = argsort_by_distance(centroids, agent_pos)
                 centroids = centroids[argsort]
+
                 igain = igain[argsort]
                 if self.reverse:
                     centroids = centroids[::-1]
