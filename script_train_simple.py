@@ -15,7 +15,7 @@ def play_sound(file_path):
 if len(sys.argv) > 1:
     model_names = sys.argv[1:]
 else:
-    model_names = ['SimpleTargetAgentEnv_10x10_1e5',]
+    model_names = ['SimpleTargetAgentEnv_10x10_1e6',]
 #     model_names = ['MultiObsFrontierEnv_absolute_DQN_1e5',
 #  'MultiObsFrontierEnv_absolute_agent_DQN_1e5',
 #  'MultiObsFrontierEnv_absolute_iGain_DQN_1e5',
