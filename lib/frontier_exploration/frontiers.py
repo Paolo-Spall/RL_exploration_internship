@@ -50,11 +50,9 @@ class FrontierDetector:
             centroids, clusters, igain = cluster_frontiers(frontiers, 
                                                         max_cluster_size=self.max_cluster_size)
         else:
-            num_centroids = self.centroids.shape[0]
-
             centroids = self.centroids
             clusters = self.clusters
-            igain = self.info_gain[:num_centroids]
+            igain = self.igain
 
         if centroids.size > 0:
             if self.sorting:
@@ -82,6 +80,7 @@ class FrontierDetector:
                                                 target_shape=(self.centroids_obs_len,),
                                                 value=self.padding_value)
         self.clusters = clusters
+        self.igain = igain
         self.info_gain = pad_obs_array( igain, 
                                     target_shape=(self.centroids_obs_len,),
                                     value=self.padding_value)

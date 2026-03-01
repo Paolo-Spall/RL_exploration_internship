@@ -50,6 +50,7 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
         super().reset(seed=seed, init_agent_pos = init_agent_pos)
 
         self.init_target_position()
+
         if self.render_mode == "human":
             print("Target initialized at position: ", self.target_pos)
 
@@ -70,9 +71,10 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
         new_x = self.agent_pos[0] + move[0]
         new_y = self.agent_pos[1] + move[1]
         if self.acceptable_move(new_x, new_y):
-            self.grid[tuple(self.agent_pos)] = self.free_color  # Mark previous position as free
-            self.grid[tuple((new_x, new_y))] = self.agent_color  # Mark new position as agent
+            # self.grid[tuple(self.agent_pos)] = self.free_color  # Mark previous position as free
+            # self.grid[tuple((new_x, new_y))] = self.agent_color  # Mark new position as agent
             self.set_agent_position(new_x, new_y)
+            self.update_obs_grid()
         
         
         reward = 0
@@ -111,7 +113,7 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
                          color='gold', 
                          edgecolors='black')
         if self.render_mode == "human":
-            plt.pause(0.001)
+            plt.pause(0.1)
         elif self.render_mode == "rgb_array":
             return fig_to_rgb(self.fig)
     
@@ -134,9 +136,16 @@ if __name__ == "__main__":
     width, height = 20, 20
     obstacle_prob = 0.0
     
-    env = SimpleTargetAgentEnv(width=width, 
-                         height=height, 
-                         obstacle_prob=obstacle_prob, 
-                         render_mode="human")
-    check_env(env)
-    
+    env = SimpleTargetAgentEnv( width=width, 
+                                height=height, 
+                                obstacle_prob=obstacle_prob, 
+                                render_mode="human")
+    plt.ion()
+    obs, _ = env.reset()
+    trunc = False
+    done = False
+    while not done and not trunc:
+        action = env.action_space.sample()
+        obs, reward, done, trunc, info = env.step(action)
+        input()
+        
