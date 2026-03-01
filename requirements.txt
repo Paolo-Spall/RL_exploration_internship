@@ -5,3 +5,5 @@ matplotlib==3.10.8
 numpy==1.26.4
 PyYAML==6.0.3
 stable_baselines3==2.7.0
+imageio[ffmpeg]
+imageio[ffmpeg]

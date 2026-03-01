@@ -11,6 +11,7 @@ if __name__ == "__main__":
 
 from lib.grid_env.obst_grid_agent_env import ObstGridAgentEnv
 from lib.rendering_utils import fig_to_rgb
+from lib.utils import move_toward
 
 class SimpleTargetAgentEnv(ObstGridAgentEnv):
     def __init__(self, max_steps=500, *args, **kwargs):
@@ -21,6 +22,7 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
             2: np.array([-1, 0]),  # Move left (negative x)
             3: np.array([0, -1]),  # Move down (negative y)
         }
+        self.direction_to_action = {tuple(v): k for k, v in self._action_to_direction.items()}
         self._action_meaning = {
             0: "RIGHT",
             1: "UP",
@@ -63,11 +65,11 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
     
     def step(self, action):
         self.steps += 1
-        try:
-            move = self._action_to_direction[action]
-        except TypeError:
-            print("Action: ", action, "type: ", type(action))
-            raise
+        # try:
+        move = self._action_to_direction[action]
+        # except TypeError:
+        #     print("Action: ", action, "type: ", type(action))
+        #     raise
         new_x = self.agent_pos[0] + move[0]
         new_y = self.agent_pos[1] + move[1]
         if self.acceptable_move(new_x, new_y):
@@ -78,15 +80,16 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
         
         
         reward = 0
-        done = False
+        term = False
+        trunc = False
         if np.array_equal(self.agent_pos, self.target_pos):
             reward = 1
-            done = True
+            term = True
             if self.render_mode == "human":
                 print("Target reached in {} steps!".format(self.steps))
 
         if self.steps >= self.max_steps:
-            done = True
+            trunc = True
             reward = -1
             if self.render_mode == "human":
                 print("Max steps reached. Target not reached.")
@@ -98,7 +101,7 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
             self.render()
 
         obs = self.get_obs()
-        return obs, reward, done, False, {}
+        return obs, reward, term, trunc, {}
 
     def get_obs(self):
         return {'agent_position':self.agent_pos, 
@@ -133,7 +136,7 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
         self.target_pos = np.array((x, y))
 
 if __name__ == "__main__":
-    width, height = 20, 20
+    width, height = 5, 5
     obstacle_prob = 0.0
     
     env = SimpleTargetAgentEnv( width=width, 
@@ -144,8 +147,17 @@ if __name__ == "__main__":
     obs, _ = env.reset()
     trunc = False
     done = False
-    while not done and not trunc:
+    while True:
         action = env.action_space.sample()
+        # move = move_toward(obs['agent_position'], obs['target_position'])
+        # action = env.direction_to_action[tuple(move)]
         obs, reward, done, trunc, info = env.step(action)
-        input()
+        #input()
+        if done:
+            print("Episode completed succesfully with reward: ", reward)
+            break
+        if trunc:
+            print("Episode truncated with reward: ", reward)
+            break
+    
         
