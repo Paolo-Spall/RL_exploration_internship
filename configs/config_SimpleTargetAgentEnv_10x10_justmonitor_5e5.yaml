@@ -1,4 +1,4 @@
-model_name: 'SimpleTargetAgentEnv_10x10_wrapped_5e5'
+model_name: 'SimpleTargetAgentEnv_10x10_justmonitor_5e5'
 train: true
 model_class: 'DQN'
 env_class: 'SimpleTargetAgentEnv'
@@ -24,10 +24,7 @@ model:
 
 wrapper:
   Monitor: true
-  DummyVecEnv: true
-  VecNormalize:
-    norm_obs: true
-    norm_reward: true
+  DummyVecEnv: false
   VecTransposeImage: false
 
 training:

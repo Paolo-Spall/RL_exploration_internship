@@ -49,10 +49,12 @@ def my_checkenv(env, model_name):
     print("Environment check done.")
 
 
-def open_config(model_name):
+def open_config(model_name, save_copy=True):
     config_file = f"configs/config_{model_name}.yaml"
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
+    if save_copy:
+        yaml.dump(config, open(f"models/config_{model_name}.yaml", 'w'))  # Save a copy of the config in the models folder
     return config
 
 
@@ -72,15 +74,20 @@ def initialize_env(config):
 def wrap_model(env, config, model_name=None, evaluation=False):
     if config.get('wrapper') == None:
         return env
-    env = Monitor(env)
-    env = DummyVecEnv([lambda: env])
+    wrapper_config = config.get('wrapper')
 
-    if config.get('wrapper').get('VecTransposeImage'):
+    if wrapper_config.get('Monitor'):
+        env = Monitor(env)
+    if wrapper_config.get('DummyVecEnv'):
+        env = DummyVecEnv([lambda: env])
+
+    if wrapper_config.get('VecTransposeImage'):
     # If your env outputs HWC images, transpose to CHW for PyTorch
         env = VecTransposeImage(env)
     
-    if evaluation:
-        env = VecNormalize.load(f"models/vec_normalize_{model_name}.pkl", env)
-    else:
-        env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
+    if wrapper_config.get('VecNormalize'):
+        if evaluation:
+            env = VecNormalize.load(f"models/vec_normalize_{model_name}.pkl", env)
+        else:
+            env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
     return env

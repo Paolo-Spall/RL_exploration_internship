@@ -9,7 +9,7 @@ def learn_model(model, total_timesteps):
     return model
 
 def train_model(model_name, check=False):
-    config = open_config(model_name)
+    config = open_config(model_name, save_copy=True)
     model_name = config['model_name']
 
     env = initialize_env(config)
