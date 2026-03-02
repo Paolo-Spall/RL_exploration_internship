@@ -65,18 +65,19 @@ class SimpleTargetAgentEnv(ObstGridAgentEnv):
     
     def step(self, action):
         self.steps += 1
-        # try:
+
         move = self._action_to_direction[action]
-        # except TypeError:
-        #     print("Action: ", action, "type: ", type(action))
-        #     raise
+
         new_x = self.agent_pos[0] + move[0]
         new_y = self.agent_pos[1] + move[1]
         if self.acceptable_move(new_x, new_y):
-            # self.grid[tuple(self.agent_pos)] = self.free_color  # Mark previous position as free
-            # self.grid[tuple((new_x, new_y))] = self.agent_color  # Mark new position as agent
             self.set_agent_position(new_x, new_y)
             self.update_obs_grid()
+        else:
+            reward = -0.1
+            if self.render_mode == "human":
+                print("Invalid move attempted: ", self._action_meaning[action])
+                print("Agent position remains: ", self.agent_pos)
         
         
         reward = 0
