@@ -5,9 +5,11 @@ from .exp_grid_2d_env_multi_in import ExpGrid2D
 from .simple_2D_multiobs_grid import Simple2DGridMultiObs
 from .simple_target_agent import SimpleTargetAgentEnv
 from .simple_target_agent_flat import SimpleTargetAgentFlatEnv
+from .multiobs_simple_target_agent import MultiobsSimpleTargetAgentEnv
 __all__ = ['Simple2DGrid', 
            'ExpGrid2D', 
            'Simple2DGridObs', 
            'Simple2DGridMultiObs', 
            'SimpleTargetAgentEnv', 
-           'SimpleTargetAgentFlatEnv']
+           'SimpleTargetAgentFlatEnv',
+           'MultiobsSimpleTargetAgentEnv']

@@ -35,7 +35,7 @@ class ObstGridEnv(gym.Env):
 
     ## SETTING THE ENVIRONMENT GRID
     def _generate_grid(self):
-        self.grid = np.ones((self.height, self.width), dtype=np.uint8) * self.free_color  # start with all free cells
+        self.grid = np.ones((self.height, self.width), dtype=np.int64) * self.free_color  # start with all free cells
         for y in range(self.height):
             for x in range(self.width):
                 if self.np_random.random() < self.obstacle_prob:

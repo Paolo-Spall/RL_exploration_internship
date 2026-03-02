@@ -11,7 +11,8 @@ from time import perf_counter
 
 from stable_baselines3 import DQN, PPO
 from lib.free_RL_exploration.environments import SimpleTargetAgentEnv,\
-                                                    SimpleTargetAgentFlatEnv
+                                                    SimpleTargetAgentFlatEnv, \
+                                                    MultiobsSimpleTargetAgentEnv
 from lib.frontier_exploration.environments import MultiObsFrontierEnv, \
                                                   MultiObsFrontAvoidanceEnv
 

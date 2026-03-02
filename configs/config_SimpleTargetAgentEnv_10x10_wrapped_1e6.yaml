@@ -1,4 +1,4 @@
-model_name: 'SimpleTargetAgentEnv_10x10_wrapped_1e5'
+model_name: 'SimpleTargetAgentEnv_10x10_wrapped_1e6'
 train: true
 model_class: 'DQN'
 env_class: 'SimpleTargetAgentEnv'
@@ -29,4 +29,4 @@ wrapper:
   VecTransposeImage: false
 
 training:
-  total_timesteps: 100000
+  total_timesteps: 1000000
