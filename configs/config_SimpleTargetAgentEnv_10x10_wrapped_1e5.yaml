@@ -1,0 +1,32 @@
+model_name: 'SimpleTargetAgentEnv_10x10_1e5'
+train: true
+model_class: 'DQN'
+env_class: 'SimpleTargetAgentEnv'
+
+env:
+  height: 10
+  width: 10
+  obstacle_prob: 0.0
+  max_steps: 250
+  render_mode: null
+  
+
+model:
+  policy: MultiInputPolicy
+  device: cpu
+  learning_rate: 0.0005
+  batch_size: 64
+  buffer_size: 50000
+  exploration_fraction: 0.7
+  exploration_final_eps: 0.05
+  target_update_interval: 500
+  train_freq: 4
+
+wrapper:
+  VecNormalize:
+    norm_obs: true
+    norm_reward: true
+  VecTransposeImage: false
+
+training:
+  total_timesteps: 100000
