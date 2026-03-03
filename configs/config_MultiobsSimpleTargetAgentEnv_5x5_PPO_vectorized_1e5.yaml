@@ -1,4 +1,4 @@
-model_name: 'MultiobsSimpleTargetAgentEnv_5x5_PPO_1e5'
+model_name: 'MultiobsSimpleTargetAgentEnv_5x5_PPO_vectorized_1e5'
 train: true
 model_class: 'PPO'
 env_class: 'MultiobsSimpleTargetAgentEnv'

@@ -12,7 +12,7 @@ env:
   obs_type: 'grid'
 
 wrapper:
-  Monitor: true   
+  Monitor: true
 
 model:
   policy: MlpPolicy
