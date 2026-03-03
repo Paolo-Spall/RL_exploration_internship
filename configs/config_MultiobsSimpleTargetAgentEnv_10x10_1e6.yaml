@@ -1,4 +1,4 @@
-model_name: 'MultiobsSimpleTargetAgentEnv_5x5_5e5'
+model_name: 'MultiobsSimpleTargetAgentEnv_10x10_1e6'
 train: true
 model_class: 'DQN'
 env_class: 'MultiobsSimpleTargetAgentEnv'

@@ -49,7 +49,7 @@ def my_checkenv(env, model_name):
     print("Environment check done.")
 
 
-def open_config(model_name, save_copy=True):
+def open_config(model_name, save_copy=False):
     config_file = f"configs/config_{model_name}.yaml"
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
