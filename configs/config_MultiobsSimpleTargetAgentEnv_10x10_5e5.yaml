@@ -10,7 +10,9 @@ env:
   max_steps: 250
   render_mode: null
   obs_type: 'grid'
-  
+
+wrapper:
+  VecMonitor: true  
 
 model:
   policy: MlpPolicy

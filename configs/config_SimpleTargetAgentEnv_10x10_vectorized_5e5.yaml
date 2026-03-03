@@ -1,4 +1,4 @@
-model_name: 'SimpleTargetAgentEnv_10x10_monitordummyvec_5e5'
+model_name: 'SimpleTargetAgentEnv_10x10_vectorized_5e5'
 train: true
 model_class: 'DQN'
 env_class: 'SimpleTargetAgentEnv'
@@ -22,7 +22,7 @@ model:
   target_update_interval: 500
   train_freq: 4
 
-vectorialize:
+vectorize:
   num_envs: 4
 
 wrapper:

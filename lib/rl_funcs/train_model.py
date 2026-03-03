@@ -12,9 +12,12 @@ def train_model(model_name, check=False):
     config = open_config(model_name, save_copy=True)
     model_name = config['model_name']
 
-    env = initialize_env(config)
+    env = initialize_env(config, training=True)
     if check:
-        my_checkenv(env, model_name)
+        if config.get('vectorize'):
+            my_checkenv(env(), model_name)
+        else:
+            my_checkenv(env, model_name)
     
     env = wrap_model(env, config)
 

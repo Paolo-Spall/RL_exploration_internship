@@ -3,7 +3,7 @@ import os
 from stable_baselines3.common.evaluation import evaluate_policy
 from gymnasium.wrappers import RecordVideo
 
-from lib.rl_funcs.learn_utils import get_policy_class, initialize_env,  wrap_model, my_checkenv, open_config
+from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_config, wrap_model_evaluation
 
 
     ## EVALUATION
@@ -21,7 +21,7 @@ def evaluate_model(model_name, check=False):
     if check:
         my_checkenv(eval_env, model_name)
 
-    eval_env = wrap_model(eval_env, config, model_name=model_name, evaluation=True)
+    eval_env = wrap_model_evaluation(eval_env, config, model_name=model_name)
     
     eval_env.training = False    # does not update them at test time
     eval_env.norm_reward = False # reward normalization is not needed at test time

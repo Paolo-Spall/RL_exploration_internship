@@ -1,6 +1,6 @@
 #/usr/bin/python3
 
-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
+from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor, VecNormalize
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import VecTransposeImage
 from stable_baselines3.common.env_checker import check_env 
@@ -63,31 +63,49 @@ def get_policy_class(config):
     model_class = globals()[class_str]
     return model_class
 
-def initialize_env(config):
+def initialize_env(config, training=False):
     env_class_str = config.get('env_class')
     env_class = globals()[env_class_str]
 
-    env = env_class(**config['env'])
-    
-    return env
+    if config.get('vectorize') and training:
+        def env_factory():
+            return env_class(**config['env'])
+        return env_factory
+    else:
+        env = env_class(**config['env'])
+        return env
 
-def wrap_model(env, config, model_name=None, evaluation=False):
+def wrap_model(env, config):
     if config.get('wrapper') == None:
         return env
     wrapper_config = config.get('wrapper')
 
-    if wrapper_config.get('Monitor'):
-        env = Monitor(env)
-    if wrapper_config.get('DummyVecEnv'):
-        env = DummyVecEnv([lambda: env])
+    if config.get('vectorize'):
+        num_envs = config['vectorize']['num_envs']
+        if wrapper_config.get('DummyVecEnv'):
+            env = DummyVecEnv([env]*num_envs)
+        if wrapper_config.get('VecMonitor'):
+            env = VecMonitor(env)
+    
+    else:
+
+        if wrapper_config.get('Monitor'):
+            env = Monitor(env)
+        if wrapper_config.get('DummyVecEnv'):
+            env = DummyVecEnv([lambda: env])
 
     if wrapper_config.get('VecTransposeImage'):
     # If your env outputs HWC images, transpose to CHW for PyTorch
         env = VecTransposeImage(env)
     
     if wrapper_config.get('VecNormalize'):
-        if evaluation:
-            env = VecNormalize.load(f"models/vec_normalize_{model_name}.pkl", env)
-        else:
-            env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
+        env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
+    return env
+
+def wrap_model_evaluation(env, config, model_name=None):
+    wrapper_config = config.get('wrapper')
+    if wrapper_config.get('Monitor') or wrapper_config.get('VecMonitor'):
+        env = Monitor(env)
+    if wrapper_config.get('VecNormalize'):
+        env = VecNormalize.load(f"models/vec_normalize_{model_name}.pkl", env)
     return env

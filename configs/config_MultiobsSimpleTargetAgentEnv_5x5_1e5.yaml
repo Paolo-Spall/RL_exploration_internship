@@ -1,18 +1,19 @@
-model_name: 'SimpleTargetAgentEnv_10x10_monitordummyvec_5e5'
+model_name: 'MultiobsSimpleTargetAgentEnv_5x5_1e5'
 train: true
 model_class: 'DQN'
-env_class: 'SimpleTargetAgentEnv'
+env_class: 'MultiobsSimpleTargetAgentEnv'
 
 env:
-  height: 10
-  width: 10
+  height: 5
+  width: 5
   obstacle_prob: 0.0
   max_steps: 250
   render_mode: null
+  obs_type: 'grid'
   
 
 model:
-  policy: MultiInputPolicy
+  policy: MlpPolicy
   device: cpu
   learning_rate: 0.0005
   batch_size: 64
@@ -22,13 +23,6 @@ model:
   target_update_interval: 500
   train_freq: 4
 
-vectorialize:
-  num_envs: 4
-
-wrapper:
-  VecMonitor: true
-  DummyVecEnv: true
-  VecTransposeImage: false
 
 training:
-  total_timesteps: 500000
+  total_timesteps: 100000
