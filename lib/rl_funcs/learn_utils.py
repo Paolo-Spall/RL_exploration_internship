@@ -103,6 +103,8 @@ def wrap_model(env, config):
     return env
 
 def wrap_model_evaluation(env, config, model_name=None):
+    if config.get('wrapper') == None:
+        return env
     wrapper_config = config.get('wrapper')
     if wrapper_config.get('Monitor') or wrapper_config.get('VecMonitor'):
         env = Monitor(env)

@@ -32,10 +32,7 @@ model:
   train_freq: 4
 
 wrapper:
-  VecTransposeImage: False
-  VecNormalize:
-    norm_obs: True
-    norm_reward: true
+  Monitor: true
 
 training:
   total_timesteps: 1000

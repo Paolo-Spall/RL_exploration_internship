@@ -3,7 +3,7 @@ import yaml
 import pprint
 import os
 
-filename = "config_new.yaml"
+filename = "config_template.yaml"
 filedir = "configs/"
 
 with open(filedir + filename, 'r') as file:
