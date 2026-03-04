@@ -18,15 +18,26 @@ class ObstGridEnv(gym.Env):
                  width, 
                  height, 
                  obstacle_prob=0.2,
-                 render_mode=None):
+                 render_mode=None,
+                 static_obstacles=False,
+                 static_obstacles_seed=42
+                 ):
         
         self.width = width
         self.height = height
         self.obstacle_prob = obstacle_prob
         self.render_mode = render_mode
+        self.static_obstacles = static_obstacles
+        self.static_obstacles_seed = static_obstacles_seed
 
         self.total_cells = width * height
         self.discovered_cells = 0
+
+        if self.static_obstacles:
+            self.np_random = np.random.default_rng(self.static_obstacles_seed)
+            self._generate_grid()
+        else:
+            pass
 
 
         if self.render_mode is not None:#== "human":
@@ -80,7 +91,9 @@ class ObstGridEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
-        self._generate_grid()
+        if not self.static_obstacles:
+            self._generate_grid()
+        
 
     
     def acceptable_move(self, new_x, new_y):
@@ -123,8 +136,30 @@ if __name__ == "__main__":
                     )
 
     print("Resetting environment...")
-    env.reset(seed=42)
+    env.reset()
     print("Rendering the environment...")
     env.render()
+
+    print("Creating static environment...")
+    env = ObstGridEnv(width=width, 
+                       height=height, 
+                       render_mode="human", 
+                       obstacle_prob=obstacle_prob,
+                       static_obstacles=True,
+                       static_obstacles_seed=42
+                    )
+
+    print("Resetting static environment...")
+    env.reset()
+    print("Rendering the environment...")
+    env.render()
+
+
+    print("Resetting static environment...")
+    env.init_simulation_render()
+    env.reset()
+    print("Rendering the environment...")
+    env.render()
+
     plt.show()
     
