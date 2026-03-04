@@ -1,0 +1,31 @@
+model_name: 'MultiobsSimpleTargetAgentEnv_obtacles_5x5_5e6'
+train: true
+model_class: 'DQN'
+env_class: 'MultiobsSimpleTargetAgentEnv'
+
+env:
+  height: 5
+  width: 5
+  obstacle_prob: 0.1
+  max_steps: 250
+  render_mode: null
+  static_obstacles: false
+  obs_type: 'grid'
+
+wrapper:
+  VecMonitor: true  
+
+model:
+  policy: MlpPolicy
+  device: cpu
+  learning_rate: 0.0005
+  batch_size: 64
+  buffer_size: 50000
+  exploration_fraction: 0.7
+  exploration_final_eps: 0.05
+  target_update_interval: 500
+  train_freq: 4
+
+
+training:
+  total_timesteps: 5000000

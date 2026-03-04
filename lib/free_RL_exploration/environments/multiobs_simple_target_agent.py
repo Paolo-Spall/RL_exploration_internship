@@ -14,11 +14,12 @@ from lib.rendering_utils import fig_to_rgb
 from lib.utils import move_toward
 
 class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
-    target_color = -1  # Dark gray for obstacles
+    target_color = 2  # Dark gray for obstacles
     agent_color = 1  # Black for agent position
+    obstacle_color = -1  # Dark gray for obstacles
     free_color = 0
     min_color = -1
-    max_color = 1
+    max_color = 2
 
     def __init__(self, 
                  max_steps=500, 
@@ -176,26 +177,44 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
 
 if __name__ == "__main__":
     width, height = 5, 5
-    obstacle_prob = 0.0
+    obstacle_prob = 0.1
 
     plt.ion()
 
-    for obs_type in ["grid", ]:#"pos_dict", "flat"]:
+    for obs_type in ["grid", "pos_dict", "flat"]:
         print(f"Testing observation type: {obs_type}")
     
         env = MultiobsSimpleTargetAgentEnv( width=width, 
                                     height=height, 
                                     obstacle_prob=obstacle_prob, 
                                     obs_type=obs_type,
-                                    render_mode="human")
-        print(env.agent_color, env.target_color, env.free_color)
+                                    render_mode="human",
+                                    static_obstacles=True,
+                                    static_obstacles_seed=40)
+        print(env.agent_color, env.target_color, env.free_color, env.obstacle_color)
+        
         
         #check_env(env)
         
         obs, _ = env.reset()
+        obs, _ = env.reset()
+        # obs, _ = env.reset()
+        # print()
+        # print("Grid:")
+        # print(env.grid)
+        # print()
+        # print()
+        # print("Obs grid:")
+        # print(env.obs_grid)
+        
         trunc = False
         done = False
+        count = 0
         while True:
+            count += 1
+            if count > 10:
+                print("Stopping after 10 steps to avoid infinite loop.")
+                break
             action = env.action_space.sample()
             # move = move_toward(obs['agent_position'], obs['target_position'])
             # action = env.direction_to_action[tuple(move)]

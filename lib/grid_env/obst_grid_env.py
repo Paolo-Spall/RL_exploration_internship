@@ -33,11 +33,7 @@ class ObstGridEnv(gym.Env):
         self.total_cells = width * height
         self.discovered_cells = 0
 
-        if self.static_obstacles:
-            self.np_random = np.random.default_rng(self.static_obstacles_seed)
-            self._generate_grid()
-        else:
-            pass
+        self.static_grid = None
 
 
         if self.render_mode is not None:#== "human":
@@ -52,12 +48,13 @@ class ObstGridEnv(gym.Env):
                 if self.np_random.random() < self.obstacle_prob:
                     self.make_obstacle(x,y)  # 1 represents an obstacle
     
-    def _generate_obs_grid(self):
-        self.obs_grid = np.ones_like(self.grid) * self.unknown_color
+
+    # def _generate_obs_grid(self):
+    #     self.obs_grid = np.ones_like(self.grid) * self.unknown_color
 
 
     def make_obstacle(self, x, y):
-        self.grid[y][x] = 1
+        self.grid[y][x] = self.obstacle_color
         max_obstacle_size = min(self.width, self.height) // 5
         obstacle_size = self.np_random.integers(max_obstacle_size//2, max_obstacle_size+1)
         for i in range(obstacle_size):
@@ -89,10 +86,46 @@ class ObstGridEnv(gym.Env):
 
     ## ENVIRONMENT DYNAMICS AND INTERACTION METHODS
 
+
+    def _generate_static_grid_once(self):
+        if self.static_grid is not None:
+            return
+
+        # Save episode RNG
+        rng_before = self.np_random
+
+        # Temporarily seed RNG for deterministic map generation
+        super().reset(seed=self.static_obstacles_seed)
+        self._generate_grid()
+        self.static_grid = self.grid.copy()
+
+        # Restore episode RNG
+        self.np_random = rng_before
+
     def reset(self, seed=None, options=None):
+        # Episode RNG (training-controlled)
         super().reset(seed=seed)
-        if not self.static_obstacles:
+
+        if self.static_obstacles:
+            self._generate_static_grid_once()
+            self.grid = self.static_grid.copy()
+        else:
             self._generate_grid()
+
+    # def reset(self, seed=None, options=None):
+    #     # Build static map once (deterministic from static_obstacles_seed)
+    #     if self.static_obstacles:    
+    #         if self.static_grid is None:
+    #             super().reset(seed=self.static_obstacles_seed)
+    #             self._generate_grid()
+    #             self.static_grid = self.grid.copy()
+
+    #         # Keep episode RNG independent from map generation
+    #         super().reset(seed=seed)
+    #         self.grid = self.static_grid.copy()
+    #     else:
+    #         super().reset(seed=seed)
+    #         self._generate_grid()
         
 
     
