@@ -142,23 +142,26 @@ if __name__ == "__main__":
     
     env = SimpleTargetAgentEnv( width=width, 
                                 height=height, 
-                                obstacle_prob=obstacle_prob, 
+                                obstacle_prob=obstacle_prob,
+                                max_steps=60,
                                 render_mode="human")
     plt.ion()
-    obs, _ = env.reset()
-    trunc = False
-    done = False
     while True:
-        action = env.action_space.sample()
-        # move = move_toward(obs['agent_position'], obs['target_position'])
-        # action = env.direction_to_action[tuple(move)]
-        obs, reward, done, trunc, info = env.step(action)
-        #input()
-        if done:
-            print("Episode completed succesfully with reward: ", reward)
-            break
-        if trunc:
-            print("Episode truncated with reward: ", reward)
-            break
+        obs, _ = env.reset()
+        print("env.steps: ", env.steps)
+        trunc = False
+        done = False
+        for _ in range(20):
+            action = env.action_space.sample()
+            # move = move_toward(obs['agent_position'], obs['target_position'])
+            # action = env.direction_to_action[tuple(move)]
+            obs, reward, done, trunc, info = env.step(action)
+            #input()
+            if done:
+                print("Episode completed succesfully with reward: ", reward)
+                break
+            if trunc:
+                print("Episode truncated with reward: ", reward)
+                break
     
         

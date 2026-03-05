@@ -51,7 +51,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
         self.target_discovery_percent = target_discovery_percent
         #self.agent_color = 1
 
-        self.total_cells = width * height
+        
         self.steps = 0
         self.max_absolute = max(self.width, self.height)
 
@@ -107,7 +107,6 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
 
             self.set_agent_position(new_x, new_y)
             discovered_cells = self.update_obs_grid()
-            self.discovered_cells += discovered_cells
 
             if self.render_mode == "human":
                 print("Action taken: ", self._action_meaning[action])
@@ -178,7 +177,7 @@ if __name__ == "__main__":
 
     plt.ion()
 
-    for obs_type in ["grid"]:#, "pos_dict", "flat"]:
+    for obs_type in ["grid","grid"]:#, "pos_dict", "flat"]:
         print(f"Testing observation type: {obs_type}")
     
         env = MultiobsSimpleAgentExplorationEnv( width=width, 
@@ -193,9 +192,9 @@ if __name__ == "__main__":
         print(env.agent_color, env.unknown_color, env.free_color, env.obstacle_color)
         
         
-        check_env(env)
-        print("Environment check passed")
-        exit()
+        # check_env(env)
+        # print("Environment check passed")
+        # exit()
         
         obs, _ = env.reset()
         # obs, _ = env.reset()
@@ -219,6 +218,9 @@ if __name__ == "__main__":
             # move = move_toward(obs['agent_position'], obs['target_position'])
             # action = env.direction_to_action[tuple(move)]
             obs, reward, done, trunc, info = env.step(action)
+            print("0bs:")
+            print(obs)
+            input("Press Enter to continue...")
             print(f"Reward: {reward}")
             #input()
             if done:

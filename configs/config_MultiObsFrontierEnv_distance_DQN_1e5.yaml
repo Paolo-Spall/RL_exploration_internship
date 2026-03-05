@@ -17,15 +17,16 @@ env:
   width: 20
 env_class: MultiObsFrontierEnv
 model:
+  learning_rate: 0.0003
   batch_size: 64
   buffer_size: 50000
+  exploration_fraction: 0.1
+  exploration_final_eps: 0.02
+  target_update_interval: 1000
+  train_freq: 1
+  learning_starts: 1000
   device: cpu
-  exploration_final_eps: 0.05
-  exploration_fraction: 0.7
-  learning_rate: 0.0005
   policy: MlpPolicy
-  target_update_interval: 500
-  train_freq: 4
   verbose: 0
 model_class: DQN
 model_name: MultiObsFrontierEnv_distance_DQN_1e5

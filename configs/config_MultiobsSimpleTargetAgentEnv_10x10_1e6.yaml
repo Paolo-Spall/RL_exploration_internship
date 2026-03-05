@@ -11,8 +11,6 @@ env:
   render_mode: null
   obs_type: 'grid'
 
-wrapper:
-  Monitor: true
 
 model:
   policy: MlpPolicy
