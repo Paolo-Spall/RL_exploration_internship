@@ -1,0 +1,33 @@
+model_name: 'MultiobsSimpleAgentExplorationEnv_5x5_09_5e5'
+train: true
+model_class: 'DQN'
+env_class: 'MultiobsSimpleAgentExplorationEnv'
+
+env:
+  height: 5
+  width: 5
+  obstacle_prob: 0.0
+  perception_range: 0
+  target_discovery_percent: 0.9
+  max_steps: 150
+  render_mode: null
+  obs_type: 'grid'
+
+wrapper:
+  Monitor: true
+
+model:
+  learning_rate: 0.0003
+  batch_size: 64
+  buffer_size: 50000
+  exploration_fraction: 0.1
+  exploration_final_eps: 0.02
+  target_update_interval: 1000
+  train_freq: 1
+  learning_starts: 1000
+  device: cpu
+  policy: MlpPolicy
+
+
+training:
+  total_timesteps: 500000
