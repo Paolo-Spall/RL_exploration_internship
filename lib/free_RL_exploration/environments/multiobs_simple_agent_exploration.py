@@ -24,7 +24,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
     def __init__(self, 
                  max_steps=500, 
                  obs_type = "pos_dict",
-                 perception_range=3,
+                 perception_range=1,
                  target_discovery_percent=0.7,
                  *args, **kwargs):
         
@@ -102,16 +102,22 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
 
         new_x = self.agent_pos[0] + move[0]
         new_y = self.agent_pos[1] + move[1]
+
         if self.acceptable_move(new_x, new_y):
+
             self.set_agent_position(new_x, new_y)
             discovered_cells = self.update_obs_grid()
             self.discovered_cells += discovered_cells
+
+            if self.render_mode == "human":
+                print("Action taken: ", self._action_meaning[action])
+                print("New agent position: ", self.agent_pos)
+
             if discovered_cells == 0:
                 # small penalty for no new discovery
                 reward -= (2.* self.perception_range +1) / self.total_cells
                 if self.render_mode == "human":
-                    print("Action taken: ", self._action_meaning[action])
-                    print(f"Agent moved to ({new_x},{new_y}) but no new cells discovered.")
+                    print(f"No new cells discovered.")
             else:
                 # reward proportional to new discovered cells
                 reward += discovered_cells / self.total_cells 
@@ -138,9 +144,6 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
                 print("Max steps reached. Exploration failed.")
         
         if self.render_mode is not None:
-            if self.render_mode == "human":
-                print("Action taken: ", self._action_meaning[action])
-                print("New agent position: ", self.agent_pos)
             self.render()
 
         obs = self.get_obs()
@@ -170,7 +173,8 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
 
 if __name__ == "__main__":
     width, height = 5, 5
-    obstacle_prob = 0.1
+    obstacle_prob = 0.0
+    perc_range = 0
 
     plt.ion()
 
@@ -179,15 +183,19 @@ if __name__ == "__main__":
     
         env = MultiobsSimpleAgentExplorationEnv( width=width, 
                                     height=height, 
-                                    obstacle_prob=obstacle_prob, 
+                                    obstacle_prob=obstacle_prob,
+                                    perception_range=perc_range,
+                                    target_discovery_percent=0.9,
                                     obs_type=obs_type,
-                                    render_mode="human",
-                                    static_obstacles=True,
-                                    static_obstacles_seed=40)
+                                    render_mode="human",)
+                                    # static_obstacles=True,
+                                    # static_obstacles_seed=40)
         print(env.agent_color, env.unknown_color, env.free_color, env.obstacle_color)
         
         
-        #check_env(env)
+        check_env(env)
+        print("Environment check passed")
+        exit()
         
         obs, _ = env.reset()
         # obs, _ = env.reset()
@@ -204,13 +212,14 @@ if __name__ == "__main__":
         count = 0
         while True:
             count += 1
-            if count > 10:
-                print("Stopping after 10 steps to avoid infinite loop.")
+            if count > 30:
+                print("Stopping after 30.")
                 break
             action = env.action_space.sample()
             # move = move_toward(obs['agent_position'], obs['target_position'])
             # action = env.direction_to_action[tuple(move)]
             obs, reward, done, trunc, info = env.step(action)
+            print(f"Reward: {reward}")
             #input()
             if done:
                 print("Episode completed succesfully with reward: ", reward)
