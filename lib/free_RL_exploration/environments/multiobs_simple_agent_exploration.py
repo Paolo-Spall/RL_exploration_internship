@@ -107,6 +107,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
 
             self.set_agent_position(new_x, new_y)
             discovered_cells = self.update_obs_grid()
+            self.discovered_cells += discovered_cells
 
             if self.render_mode == "human":
                 print("Action taken: ", self._action_meaning[action])
@@ -114,12 +115,14 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
 
             if discovered_cells == 0:
                 # small penalty for no new discovery
-                reward -= (2.* self.perception_range +1) / self.total_cells
+                # reward -= (2.* self.perception_range +1) / self.total_cells
+                reward = -0.1
                 if self.render_mode == "human":
                     print(f"No new cells discovered.")
             else:
                 # reward proportional to new discovered cells
-                reward += discovered_cells / self.total_cells 
+                # reward += discovered_cells / self.total_cells 
+                reward = 0.1
         else:
             reward = -0.1
             if self.render_mode == "human":
