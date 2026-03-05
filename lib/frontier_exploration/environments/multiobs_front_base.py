@@ -48,14 +48,18 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
                            'i_gain':False},
                  sorting=True,
                  reverse=False,
-                 padding_value=0. # value to fill observation arrays when the n of clusters < centroids_obs_len
+                 padding_value=0. ,
+                 static_obstacles=False,
+                 static_obstacles_seed=None
                  ):
         
         super().__init__(perception_range=perc_range, 
                          width=width, 
                          height=height, 
                          obstacle_prob=obstacle_prob,
-                         render_mode=render_mode)
+                         render_mode=render_mode,
+                         static_obstacles=static_obstacles,
+                         static_obstacles_seed=static_obstacles_seed)
         
         
         self.target_discovery_percent = target_discovery_percent

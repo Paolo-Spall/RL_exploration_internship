@@ -47,18 +47,18 @@ else:
 #  'MultiObsFrontierEnv_distance_DQN_1e5',
 #  'MultiObsFrontierEnv_distance_agent_DQN_1e5']
 
-
+seed = 0
 for model_name in model_names:
-    training_time_monitor(record_model_video_wrapper)(
-		model_name,	seed=42)
+    # training_time_monitor(record_model_video_wrapper)(
+	# 	model_name,	seed=42)
     
     training_time_monitor(record_model_video)(
 		model_name,
-		output_path="video.mp4",
+		output_path=f"models/video_{model_name}_seed_{seed}.mp4",
 		max_steps=None,
 		fps=4,
 		deterministic=True,
 		check=False,
-        seed=42
+        seed=seed
 	)
     

@@ -11,6 +11,8 @@ env:
   render_mode: null
   reverse: false
   sorting: true
+  static_obstacles: true
+  static_obstacles_seed: 42
   target_discovery_percent: 0.9
   width: 20
 env_class: MultiObsFrontAvoidanceEnv
@@ -29,6 +31,6 @@ model_class: DQN
 model_name: MultiObsFrontAvoidanceEnv_distance_agent_iGain_DQN_1e5
 train: true
 training:
-  total_timesteps: 100000
+  total_timesteps: 1000
 wrapper:
   Monitor: true

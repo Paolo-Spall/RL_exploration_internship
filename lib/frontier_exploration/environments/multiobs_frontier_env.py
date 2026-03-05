@@ -50,7 +50,7 @@ if __name__ == "__main__":
     truncations = 0
     terminations = 0
     for obs_type in ['distance']:#['relative', 'absolute', 'distance']:
-        for info_gain in [False]:# [True, False]
+        for info_gain in [True, False]:# [True, False]
             for ag_pos in [False]:# [True, False]
                 #print(f"Obs type: {obs_type}, Info gain: {info_gain}, Agent pos: {ag_pos}")
                 print("Creating environment...")
@@ -64,7 +64,10 @@ if __name__ == "__main__":
                                             reverse=False,
                                             obs_spec={'type':obs_type,
                                                     'ag_pos':ag_pos,
-                                                    'i_gain':info_gain})
+                                                    'i_gain':info_gain},
+                                            static_obstacles=True,
+                                            static_obstacles_seed=42
+                                            )
                 #for i in range(50):
 
                 # check_env(env, warn=True)
