@@ -9,6 +9,7 @@ if __name__ == "__main__":
 
 from lib.grid_env.obst_grid_agent_env import ObstGridAgentEnv
 from lib.grid_env.stepper_wrapper import StepperWrapper
+from lib.grid_env.stepper_wrapper_class import stepper_wrapper_class
 
 
 
@@ -23,12 +24,12 @@ class ObstGridAgentExplEnv(ObstGridAgentEnv):
 
     def reset(self, seed=None, *args, **kwargs):
         super().reset(seed=seed, *args, **kwargs)
-        self._generate_obs_grid()
+        self._generate_believes_grid()
         
 
     ## OBSERVATIONS
-    def _generate_obs_grid(self):
-        self.obs_grid = np.ones_like(self.grid) * self.unknown_color
+    def _generate_believes_grid(self):
+        self.believes_grid = np.ones_like(self.grid) * self.unknown_color
 
 
     def update_obs_grid(self):
@@ -42,10 +43,12 @@ class ObstGridAgentExplEnv(ObstGridAgentEnv):
         xmax = min(self.width - 1, x + r)
         obs_area = self.grid[ymin:ymax+1, xmin:xmax+1]
 
-        discovered_cells = np.sum(self.obs_grid[ymin:ymax+1, xmin:xmax+1] == self.unknown_color)
+        discovered_cells = np.sum(self.believes_grid[ymin:ymax+1, xmin:xmax+1] == self.unknown_color)
         self.discovered_cells += discovered_cells
 
-        self.obs_grid[ymin:ymax+1, xmin:xmax+1] = obs_area
+        self.believes_grid[ymin:ymax+1, xmin:xmax+1] = obs_area
+
+        self.obs_grid = np.copy(self.believes_grid)
 
         self.obs_grid[self.agent_pos[1]][self.agent_pos[0]] = self.agent_color  # mark agent position
         return discovered_cells
@@ -75,26 +78,50 @@ class ObstGridAgentExplEnv(ObstGridAgentEnv):
 
 
 if __name__ == "__main__":
-    width, height = 20, 20
+    width, height = 10, 10
     obstacle_prob = 0.05
-    perception_range = 3
+    perception_range = 0
     print("Creating environment...")
-    env = ObstGridAgentExplEnv( width=width, 
-                                height=height, 
-                                obstacle_prob=obstacle_prob,
-                                perception_range=perception_range,
-                                render_mode="human"
-                                )
+    env = stepper_wrapper_class(ObstGridAgentExplEnv)( width=width, 
+                                                        height=height, 
+                                                        obstacle_prob=obstacle_prob,
+                                                        perception_range=perception_range,
+                                                        render_mode="human"
+                                                        )
 
-    env = StepperWrapper(env)  
 
     print("Resetting environment...")
     env.reset()
 
-    plt.show()
+    plt.ion()
+    
 
-    for action in range(4):
+    for _ in range(20):
+        action = np.random.randint(0, 4)
         print("Taking action: ", action)
-        env._env.init_simulation_render()
+        #env._env.init_simulation_render()
         env.step(action)
-        plt.show()
+        #plt.show()
+    
+
+    # width, height = 20, 20
+    # obstacle_prob = 0.05
+    # perception_range = 3
+    # print("Creating environment...")
+    # env = ObstGridAgentExplEnv( width=width, 
+    #                             height=height, 
+    #                             obstacle_prob=obstacle_prob,
+    #                             perception_range=perception_range,
+    #                             render_mode="human"
+    #                             )
+
+    # env = StepperWrapper(env)  
+
+    # print("Resetting environment...")
+    # env.reset()
+    # plt.show()
+    # for action in range(4):
+        # print("Taking action: ", action)
+        # env._env.init_simulation_render()
+        # env.step(action)
+        # plt.show()

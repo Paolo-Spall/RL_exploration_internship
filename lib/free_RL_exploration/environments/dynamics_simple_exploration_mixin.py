@@ -10,8 +10,7 @@ if __name__ == "__main__":
 
 from lib.grid_env.obst_grid_agent_env import ObstGridAgentEnv
 
-def stepper_wrapper_class(cls_env):
-    class SteppingClass(cls_env):
+class SteppingClassMixin:
         """ A wrapper for grid environments that allows movement in four cardinal directions:
         """
 
@@ -64,28 +63,29 @@ def stepper_wrapper_class(cls_env):
             super().render()
             if self.render_mode == "human":
                 plt.pause(0.5)
-    return SteppingClass
+
 
 
 
 if __name__ == "__main__":
-    width, height = 20, 20
-    obstacle_prob = 0.05
-    print("Creating environment...")
-    stepping_env_class = stepper_wrapper_class(ObstGridAgentEnv)
-    env = stepping_env_class(width=width, 
-                            height=height, 
-                            render_mode="human", 
-                            obstacle_prob=obstacle_prob
-                        )
+    pass
+    # width, height = 20, 20
+    # obstacle_prob = 0.05
+    # print("Creating environment...")
+    # stepping_env_class = stepper_wrapper_class(ObstGridAgentEnv)
+    # env = stepping_env_class(width=width, 
+    #                         height=height, 
+    #                         render_mode="human", 
+    #                         obstacle_prob=obstacle_prob
+    #                     )
 
-    print("Resetting environment...")
-    env.reset(init_agent_pos=(1,5))
+    # print("Resetting environment...")
+    # env.reset(init_agent_pos=(1,5))
 
-    plt.show()
+    # plt.show()
 
-    for action in range(4):
-        print("Taking action: ", action)
-        env.init_simulation_render()
-        env.step(action)
-        plt.show()
+    # for action in range(4):
+    #     print("Taking action: ", action)
+    #     env.init_simulation_render()
+    #     env.step(action)
+    #     plt.show()

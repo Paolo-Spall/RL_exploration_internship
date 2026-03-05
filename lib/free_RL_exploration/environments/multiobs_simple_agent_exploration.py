@@ -9,12 +9,12 @@ if __name__ == "__main__":
     import sys
     sys.path.append(".")
 
-from lib.grid_env.obst_grid_agent_env import ObstGridAgentEnv
+from lib.grid_env.obst_grid_agent_expl_env import ObstGridAgentExplEnv
 from lib.rendering_utils import fig_to_rgb
 from lib.utils import move_toward
 
-class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
-    target_color = 2  # Dark gray for obstacles
+class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
+    unknown_color = 2  # Dark gray for obstacles
     agent_color = 1  # Black for agent position
     obstacle_color = -1  # Dark gray for obstacles
     free_color = 0
@@ -24,8 +24,12 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
     def __init__(self, 
                  max_steps=500, 
                  obs_type = "pos_dict",
+                 perception_range=3,
+                 target_discovery_percent=0.7,
                  *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        
+        super().__init__(perception_range=perception_range, *args, **kwargs)
+
         self._action_to_direction = {
             0: np.array([1, 0]),   # Move right (positive x)
             1: np.array([0, 1]),   # Move up (positive y)
@@ -33,6 +37,7 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
             3: np.array([0, -1]),  # Move down (negative y)
         }
         self.direction_to_action = {tuple(v): k for k, v in self._action_to_direction.items()}
+
         self._action_meaning = {
             0: "RIGHT",
             1: "UP",
@@ -42,11 +47,12 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
 
         self.max_steps = max_steps
         self.obs_type = obs_type
-
+        self.perception_range = perception_range
+        self.target_discovery_percent = target_discovery_percent
         #self.agent_color = 1
 
-
-        
+        self.total_cells = width * height
+        self.steps = 0
         self.max_absolute = max(self.width, self.height)
 
         if obs_type == "pos_dict":
@@ -79,12 +85,7 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
     def reset(self, seed=None, options=None, init_agent_pos = None):
         super().reset(seed=seed, init_agent_pos = init_agent_pos)
         self.steps = 0
-
-        self.init_target_position()
-
-        if self.render_mode == "human":
-            print("Target initialized at position: ", self.target_pos)
-
+        self.discovered_cells = 0
         self.update_obs_grid()
         if self.render_mode is not None:
             self.render()
@@ -95,6 +96,7 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
     
     def step(self, action):
         self.steps += 1
+        reward = 0
 
         move = self._action_to_direction[action]
 
@@ -102,7 +104,17 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
         new_y = self.agent_pos[1] + move[1]
         if self.acceptable_move(new_x, new_y):
             self.set_agent_position(new_x, new_y)
-            self.update_obs_grid()
+            discovered_cells = self.update_obs_grid()
+            self.discovered_cells += discovered_cells
+            if discovered_cells == 0:
+                # small penalty for no new discovery
+                reward -= (2.* self.perception_range +1) / self.total_cells
+                if self.render_mode == "human":
+                    print("Action taken: ", self._action_meaning[action])
+                    print(f"Agent moved to ({new_x},{new_y}) but no new cells discovered.")
+            else:
+                # reward proportional to new discovered cells
+                reward += discovered_cells / self.total_cells 
         else:
             reward = -0.1
             if self.render_mode == "human":
@@ -110,20 +122,20 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
                 print("Agent position remains: ", self.agent_pos)
         
         
-        reward = 0
+        
         term = False
         trunc = False
-        if np.array_equal(self.agent_pos, self.target_pos):
-            reward = 1
+        if (self.discovered_cells / self.total_cells) > self.target_discovery_percent:
+            reward += 1
             term = True
             if self.render_mode == "human":
-                print("Target reached in {} steps!".format(self.steps))
+                print(f"Exploration completed in {self.steps} steps!")
 
         if self.steps >= self.max_steps:
             trunc = True
-            reward = -1
+            reward -= 1
             if self.render_mode == "human":
-                print("Max steps reached. Target not reached.")
+                print("Max steps reached. Exploration failed.")
         
         if self.render_mode is not None:
             if self.render_mode == "human":
@@ -144,37 +156,17 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
             return self.obs_grid.flatten()
         
     def update_obs_grid(self):
-        super().update_obs_grid()
-        x_target, y_target = self.target_pos
-        self.obs_grid[y_target, x_target] = self.target_color
+        return super().update_obs_grid()
 
     def render(self):
         super().render()
-        self.ax_env.scatter(self.target_pos[0], 
-                         self.target_pos[1], 
-                         marker='*', 
-                         s=200, 
-                         color='gold', 
-                         edgecolors='black')
         if self.render_mode == "human":
             plt.pause(0.1)
         elif self.render_mode == "rgb_array":
             return fig_to_rgb(self.fig)
     
 
-    def random_position(self):
-        """initialize agent position randomly in an acceptable cell"""
-        x = self.np_random.integers(0, self.width) 
-        y = self.np_random.integers(0, self.height)
-        while not self.acceptable_move(x, y):
-            x = self.np_random.integers(0, self.width)
-            y = self.np_random.integers(0, self.height)
-        return x, y
     
-    
-    def init_target_position(self):
-        x, y = self.random_position()
-        self.target_pos = np.array((x, y))
 
 if __name__ == "__main__":
     width, height = 5, 5
@@ -182,23 +174,22 @@ if __name__ == "__main__":
 
     plt.ion()
 
-    for obs_type in ["grid", "pos_dict", "flat"]:
+    for obs_type in ["grid"]:#, "pos_dict", "flat"]:
         print(f"Testing observation type: {obs_type}")
     
-        env = MultiobsSimpleTargetAgentEnv( width=width, 
+        env = MultiobsSimpleAgentExplorationEnv( width=width, 
                                     height=height, 
                                     obstacle_prob=obstacle_prob, 
                                     obs_type=obs_type,
                                     render_mode="human",
                                     static_obstacles=True,
                                     static_obstacles_seed=40)
-        print(env.agent_color, env.target_color, env.free_color, env.obstacle_color)
+        print(env.agent_color, env.unknown_color, env.free_color, env.obstacle_color)
         
         
         #check_env(env)
         
         obs, _ = env.reset()
-        
         # obs, _ = env.reset()
         # print()
         # print("Grid:")

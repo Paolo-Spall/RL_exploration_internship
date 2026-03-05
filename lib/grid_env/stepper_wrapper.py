@@ -63,6 +63,8 @@ class StepperWrapper:
     
     def render(self):
         self._env.render()
+        if self._env.render_mode == "human":
+            plt.pause(0.5)
 
 
 
