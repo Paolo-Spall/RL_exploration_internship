@@ -136,7 +136,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
         term = False
         trunc = False
         if (self.discovered_cells / self.total_cells) > self.target_discovery_percent:
-            reward += 1
+            reward += 5
             term = True
             if self.render_mode == "human":
                 print(f"Exploration completed in {self.steps} steps!")
