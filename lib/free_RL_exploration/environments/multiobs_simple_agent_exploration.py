@@ -107,7 +107,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
 
             self.set_agent_position(new_x, new_y)
             discovered_cells = self.update_obs_grid()
-            self.discovered_cells += discovered_cells
+            #self.discovered_cells += discovered_cells
 
             if self.render_mode == "human":
                 print("Action taken: ", self._action_meaning[action])
