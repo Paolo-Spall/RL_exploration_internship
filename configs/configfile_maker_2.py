@@ -33,7 +33,7 @@ for obs_type in [ 'absolute', 'relative','distance']:
             else:
                 config['model']['policy'] = 'MlpPolicy'
             config['model']['verbose'] = 0
-            config['training']['total_timesteps'] = 1000
+            config['training']['total_timesteps'] = 100000
             out_filename = filedir + "config_" + model_name + ".yaml"
             with open(out_filename, 'w') as outfile:
                 yaml.dump(config, outfile)

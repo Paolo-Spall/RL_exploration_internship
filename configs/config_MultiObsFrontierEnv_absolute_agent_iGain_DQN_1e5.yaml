@@ -31,6 +31,6 @@ model_class: DQN
 model_name: MultiObsFrontierEnv_absolute_agent_iGain_DQN_1e5
 train: true
 training:
-  total_timesteps: 1000
+  total_timesteps: 100000
 wrapper:
   Monitor: true
