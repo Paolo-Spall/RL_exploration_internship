@@ -31,7 +31,7 @@ class SimpleTargetAgentFlatEnv(ObstGridAgentEnv):
         }
 
         self.max_steps = max_steps
-        self.steps = 0
+        
         self.max_absolute = max(self.width, self.height)
 
         self.observation_space = spaces.Box(low=0, 
@@ -47,6 +47,7 @@ class SimpleTargetAgentFlatEnv(ObstGridAgentEnv):
         super().reset(seed=seed, init_agent_pos = init_agent_pos)
 
         self.init_target_position()
+        self.steps = 0
 
         if self.render_mode == "human":
             print("Target initialized at position: ", self.target_pos)
