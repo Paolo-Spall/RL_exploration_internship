@@ -9,7 +9,7 @@ env:
   obstacle_prob: 0.0
   perception_range: 0
   target_discovery_percent: 0.8
-  max_steps: 150
+  max_steps: 60
   render_mode: null
   obs_type: 'grid'
 

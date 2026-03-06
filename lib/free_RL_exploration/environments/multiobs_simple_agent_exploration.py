@@ -85,6 +85,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
     def reset(self, seed=None, options=None, init_agent_pos = None):
         super().reset(seed=seed, init_agent_pos = init_agent_pos)
         self.steps = 0
+        self.stuck_steps = 0
         self.discovered_cells = 0
         self.update_obs_grid()
         if self.render_mode is not None:
@@ -116,7 +117,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
             if discovered_cells == 0:
                 # small penalty for no new discovery
                 # reward -= (2.* self.perception_range +1) / self.total_cells
-                # reward = -0.1
+                reward = -0.02
                 if self.render_mode == "human":
                     print(f"No new cells discovered.")
             else:
@@ -126,7 +127,8 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
                 reward += 1
         else:
             # reward = -0.1
-            reward -= 0.1
+            self.stuck_steps += 1
+            reward -= 0.2
             if self.render_mode == "human":
                 print("Invalid move attempted: ", self._action_meaning[action])
                 print("Agent position remains: ", self.agent_pos)
@@ -147,6 +149,13 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
             if self.render_mode == "human":
                 print("Max steps reached. Exploration failed.")
         
+        if self.stuck_steps >= 10:
+            trunc = True
+            reward -= 1
+            if self.render_mode == "human":
+                print("Agent stuck for 10 steps. Exploration failed.")
+
+
         if self.render_mode is not None:
             self.render()
 
