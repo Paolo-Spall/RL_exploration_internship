@@ -21,7 +21,7 @@ model:
   buffer_size: 50000
   device: cpu
   exploration_final_eps: 0.05
-  exploration_fraction: 0.7
+  exploration_fraction: 0.2
   learning_rate: 0.0005
   policy: MlpPolicy
   target_update_interval: 500

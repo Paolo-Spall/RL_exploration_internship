@@ -28,7 +28,7 @@ model:
   learning_rate: 0.0005
   batch_size: 64
   buffer_size: 50000
-  exploration_fraction: 0.7
+  exploration_fraction: 0.2
   exploration_final_eps: 0.05
   target_update_interval: 500
   train_freq: 4

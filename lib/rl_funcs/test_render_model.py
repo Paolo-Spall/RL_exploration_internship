@@ -28,6 +28,7 @@ def test_render_model(model_name, check=False):
     print("Model loaded.")
 
     obs, _ = env.reset()
+    tot_reward = 0
 
     print("Starting exploration...")
     for step in range(300):
@@ -36,6 +37,7 @@ def test_render_model(model_name, check=False):
         
         obs, reward, done, truncated, _ = env.step(intaction)
         print(f"Step: {step}, Reward: {reward}, Done: {done}")
+        tot_reward += reward
 
         #time.sleep(0.1)
 
@@ -46,6 +48,7 @@ def test_render_model(model_name, check=False):
             print("Exploration truncated!")
             break
 
+    print(f"Total reward: {tot_reward}")
     env.close()
 
 

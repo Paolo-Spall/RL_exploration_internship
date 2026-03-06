@@ -31,6 +31,8 @@ class MultiObsFrontierEnv(StepMixin, MultiObsFrontBase):
             obs, reward, terminated, truncated, info = super().step(self.agent_pos)
             reward -= 1
             truncated = True
+            if self.render_mode == "human":
+                print("Invalid action: Selected padding element. Episode truncated.")
             return obs, reward, terminated, truncated, info
         
         # computing the next position toward the target centroid

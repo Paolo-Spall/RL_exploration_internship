@@ -24,7 +24,11 @@ class MultiobsSimpleTargetAgentEnv(ObstGridAgentEnv):
     def __init__(self, 
                  max_steps=500, 
                  obs_type = "pos_dict",
+                 no_obst_color=False,
                  *args, **kwargs):
+        if no_obst_color:
+            self.target_color = -1
+            self.max_color = 1
         super().__init__(*args, **kwargs)
         self._action_to_direction = {
             0: np.array([1, 0]),   # Move right (positive x)

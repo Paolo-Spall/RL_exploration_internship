@@ -59,10 +59,14 @@ class StepMixin:
         if (self.discovered_cells / self.total_cells) > self.target_discovery_percent:
             terminated = True
             reward += 1  # big reward for completing exploration
+            if self.render_mode == "human":
+                print("Target discovery percent reached. Exploration complete!")
         
         if self.current_step >= self.max_steps:
             truncated = True
             reward -= 1  # penalty for running out of time
+            if self.render_mode == "human":
+                print("Max steps reached. Exploration truncated.")
 
         if self.render_mode is not None: #== "human":
             self.render()        
