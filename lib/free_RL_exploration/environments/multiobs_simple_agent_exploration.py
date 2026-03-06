@@ -87,6 +87,15 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
         self.steps = 0
         self.stuck_steps = 0
         self.discovered_cells = 0
+
+        self.prev_pos = None
+        self.prev_prev_pos = None
+        self.no_progress_steps = 0
+        self.visit_count = np.zeros((self.height, self.width), dtype=np.int32)
+        ax, ay = self.agent_pos
+        self.visit_count[ay, ax] = 1
+
+
         self.update_obs_grid()
         if self.render_mode is not None:
             self.render()
@@ -98,6 +107,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
     def step(self, action):
         self.steps += 1
         reward = -0.01  # small step penalty to encourage faster exploration
+        old_pos = tuple(self.agent_pos)
 
         move = self._action_to_direction[action]
 
@@ -117,7 +127,8 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
             if discovered_cells == 0:
                 # small penalty for no new discovery
                 # reward -= (2.* self.perception_range +1) / self.total_cells
-                reward = -0.02
+                reward = -0.2
+                self.no_progress_steps += 1
                 if self.render_mode == "human":
                     print(f"No new cells discovered.")
             else:
@@ -125,18 +136,43 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
                 # reward += discovered_cells / self.total_cells 
                 # reward = 0.1
                 reward += 1
+                self.no_progress_steps = 0
         else:
             # reward = -0.1
+            new_pos = old_pos
             self.stuck_steps += 1
             reward -= 0.2
             if self.render_mode == "human":
                 print("Invalid move attempted: ", self._action_meaning[action])
                 print("Agent position remains: ", self.agent_pos)
         
+        new_pos = tuple(self.agent_pos)
+
+        # A<->B oscillation penalty
+        if (
+            self.prev_prev_pos is not None
+            and new_pos == self.prev_prev_pos
+            and old_pos == self.prev_pos
+        ):
+            reward -= 0.15
+
         
-        
+
+        self.visit_count[new_pos[1], new_pos[0]] += 1
+
+        self.prev_prev_pos = self.prev_pos
+        self.prev_pos = old_pos
+
         term = False
         trunc = False
+
+        if self.no_progress_steps >= 20:
+            trunc = True
+            reward -= 0.5
+            if self.render_mode == "human":
+                print("No progress for 20 steps. Exploration truncated.")
+        
+        
         if (self.discovered_cells / self.total_cells) > self.target_discovery_percent:
             reward += 5
             term = True
