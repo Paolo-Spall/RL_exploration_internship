@@ -8,8 +8,8 @@ from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checke
 
 ####   EVALUATION
 
-def evaluate_model(model_name, check=False, out_dir="models"):
-    config = open_config(model_name)
+def evaluate_model(model_name, check=False, dir=""):
+    config = open_config(model_name, dir=dir)
 
     model_name = config['model_name']
         
@@ -23,7 +23,7 @@ def evaluate_model(model_name, check=False, out_dir="models"):
 
     eval_env = wrap_model_evaluation(eval_env, config, 
                                      model_name=model_name, 
-                                     out_dir=out_dir)
+                                     dir=dir)
     
     eval_env.training = False    # does not update them at test time
     eval_env.norm_reward = False # reward normalization is not needed at test time
@@ -32,7 +32,7 @@ def evaluate_model(model_name, check=False, out_dir="models"):
     
     model_class = get_policy_class(config)
 
-    model = model_class.load(f"{out_dir}/{model_name}", env=eval_env, device="cpu")
+    model = model_class.load(f"models/{dir}{model_name}", env=eval_env, device="cpu")
 
     mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=30)
 
@@ -40,7 +40,7 @@ def evaluate_model(model_name, check=False, out_dir="models"):
 
     print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
 
-    output_file = f"{out_dir}/evaluation_{model_name}.txt"
+    output_file = f"models/{dir}evaluation_{model_name}.txt"
     with open(output_file, "a") as f:
         f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")
     print(f"Evaluation results saved to {output_file}")

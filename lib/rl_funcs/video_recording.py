@@ -21,7 +21,8 @@ def record_model_video(
     fps=10,
     deterministic=True,
     check=False,
-    seed=None):
+    seed=None,
+    dir=""):
     """Record and save a video of the environment rendering for a trained model.
 
     Args:
@@ -32,7 +33,7 @@ def record_model_video(
         deterministic: Whether to use deterministic actions.
         check: If True, run Gym environment checks.
     """
-    config = open_config(model_name)
+    config = open_config(model_name, dir=dir)
     config["env"]["render_mode"] = None
     model_name = config["model_name"]
 
@@ -45,7 +46,7 @@ def record_model_video(
     model_class = get_policy_class(config)
 
     print("Loading trained model...")
-    model = model_class.load(f"models/{model_name}", env=env, device="cpu")
+    model = model_class.load(f"models/{dir}{model_name}", env=env, device="cpu")
     print("Model loaded.")
 
     if not hasattr(env, "fig") or env.fig is None:

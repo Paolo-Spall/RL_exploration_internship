@@ -50,12 +50,12 @@ def my_checkenv(env, model_name):
     print("Environment check done.")
 
 
-def open_config(model_name, save_copy=False):
-    config_file = f"configs/config_{model_name}.yaml"
+def open_config(model_name, save_copy=False, dir=""):
+    config_file = f"configs/{dir}config_{model_name}.yaml"
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
     if save_copy:
-        yaml.dump(config, open(f"models/config_{model_name}.yaml", 'w'))  # Save a copy of the config in the models folder
+        yaml.dump(config, open(f"models/{dir}config_{model_name}.yaml", 'w'))  # Save a copy of the config in the models folder
     return config
 
 
@@ -103,12 +103,12 @@ def wrap_model(env, config):
         env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
     return env
 
-def wrap_model_evaluation(env, config, model_name=None, out_dir="models"):
+def wrap_model_evaluation(env, config, model_name=None, dir="models"):
     if config.get('wrapper') == None:
         return env
     wrapper_config = config.get('wrapper')
     if wrapper_config.get('Monitor') or wrapper_config.get('VecMonitor'):
         env = Monitor(env)
     if wrapper_config.get('VecNormalize'):
-        env = VecNormalize.load(f"{out_dir}/vec_normalize_{model_name}.pkl", env)
+        env = VecNormalize.load(f"models/{dir}vec_normalize_{model_name}.pkl", env)
     return env
