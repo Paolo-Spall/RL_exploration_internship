@@ -27,7 +27,7 @@ for obs_type in [ 'absolute', 'relative','distance']:
                 model_name += "agent_"
             if info_gain:
                 model_name += "iGain_"
-            model_name += "DQN_dynamic_1e5"
+            model_name += "DQN_1e5"
             config['model_name'] = model_name
             if ag_pos:
                 config['model']['policy'] = 'MultiInputPolicy'

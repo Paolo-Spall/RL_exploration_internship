@@ -33,6 +33,7 @@ train: true
 training:
   total_timesteps: 100000
 wrapper:
+  VecMonitor: true
   VecNormalize:
     norm_obs: true
     norm_reward: true

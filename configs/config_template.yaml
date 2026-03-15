@@ -18,6 +18,8 @@ env:
     type: 'absolute'
     ag_pos: True
     i_gain: False
+  static_obstacles: true
+  static_obstacles_seed: 42
   
 
 model:
@@ -33,6 +35,7 @@ model:
 
 wrapper:
   VecTransposeImage: False
+  VecMonitor: True
   VecNormalize:
     norm_obs: True
     norm_reward: true
