@@ -18,8 +18,6 @@ env:
     type: 'absolute'
     ag_pos: True
     i_gain: False
-  static_obstacles: true
-  static_obstacles_seed: 42
   
 
 model:
@@ -34,7 +32,10 @@ model:
   train_freq: 4
 
 wrapper:
-  Monitor: true
+  VecTransposeImage: False
+  VecNormalize:
+    norm_obs: True
+    norm_reward: true
 
 training:
   total_timesteps: 1000

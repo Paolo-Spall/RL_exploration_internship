@@ -13,7 +13,19 @@ def play_sound(file_path):
         pass  # If sound playback fails, just ignore it
 
 if len(sys.argv) > 1:
-    model_names = sys.argv[1:]
+    if sys.argv[1] == "-dir":
+        # If the first argument is "-dir", read model names from the specified directory
+        dir_path = sys.argv[2] #if len(sys.argv) > 2 else "configs/"
+        model_names = []
+        for filename in os.listdir(dir_path):
+            if filename.startswith("config_") and filename.endswith(".yaml"):
+                model_name = filename[len("config_"):-len(".yaml")]
+                model_names.append(model_name)
+        out_dir = "models/"+dir_path.strip("/")
+        os.makedirs(out_dir, exist_ok=True)
+    else:
+        out_dir = "models"
+        model_names = sys.argv[1:]
 else:
     model_names = ['MultiObsFrontierEnv_absolute_DQN_1e5',
  'MultiObsFrontierEnv_absolute_agent_DQN_1e5',
@@ -44,10 +56,10 @@ else:
 #     
  
 
-table_file = "models/evaluation_results_0.txt"
+table_file = out_dir + "/evaluation_results_0.txt"
 n=0
 while os.path.exists(table_file): 
-    table_file = f"models/evaluation_results_{n}.txt"
+    table_file = out_dir + f"/evaluation_results_{n}.txt"
     n+=1
 
 with open(table_file, "w") as f:
@@ -60,17 +72,17 @@ print()
 print("========================================")  
 
 for model_name in model_names:
-    elapsed_time = train_model(model_name, check=True)
+    elapsed_time = train_model(model_name ,check=True, out_dir=out_dir)
     play_sound("/usr/share/sounds/sound-icons/start")
 
-    mean_reward, std_reward = evaluate_model(model_name)
+    mean_reward, std_reward = evaluate_model(model_name, out_dir=out_dir)
     with open(table_file, "a") as f:
         f.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{elapsed_time}")
     
     if not no_video:
         record_model_video(
             model_name,
-            output_path=f"models/video_{model_name}.mp4",
+            output_path=f"{out_dir}/video_{model_name}.mp4",
             max_steps=None,
             fps=4,
             deterministic=True,

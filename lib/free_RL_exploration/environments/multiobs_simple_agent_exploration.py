@@ -18,7 +18,7 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
     agent_color = 1  # Black for agent position
     obstacle_color = -1  # Dark gray for obstacles
     free_color = 0
-    min_color = -1
+    min_color = 0
     max_color = 2
 
     def __init__(self, 

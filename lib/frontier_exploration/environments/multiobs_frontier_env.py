@@ -12,6 +12,11 @@ from lib.frontier_exploration.environments.multiobs_front_base import MultiObsFr
 from lib.utils import step_toward
 
 class MultiObsFrontierEnv(StepMixin, MultiObsFrontBase):
+    """MultiObsFrontBase ( FrontierMixin + ObstGridAgentExplEnv ( 
+                                                ObstGridAgentEnv (
+                                                    ObstGridEnv ( gym.Env) ) ) )
+       + StepMixin (step and reset methods for frontier-based exploration)
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
@@ -27,12 +32,17 @@ class MultiObsFrontierEnv(StepMixin, MultiObsFrontBase):
         # extracting the target centroid coordinates
         target_centroid = np.array(self.obs_centroids[action].copy(), dtype=np.int64)
 
+        # case of SELECTED PADDING ELEMENT 
         if np.all(target_centroid == self.padding_value):
+            # running the StepMixin step(<current position>) anyway ??
             obs, reward, terminated, truncated, info = super().step(self.agent_pos)
             reward -= 1
             truncated = True
+
+            # render
             if self.render_mode == "human":
                 print(f"Invalid action = {action}: Selected padding element. Episode truncated.")
+            
             return obs, reward, terminated, truncated, info
         
         # computing the next position toward the target centroid

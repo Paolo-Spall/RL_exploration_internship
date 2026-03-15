@@ -8,7 +8,7 @@ def learn_model(model, total_timesteps):
     model.learn(total_timesteps=total_timesteps )
     return model
 
-def train_model(model_name, check=False):
+def train_model(model_name, check=False, out_dir="models"):
     config = open_config(model_name, save_copy=True)
     model_name = config['model_name']
 
@@ -32,14 +32,14 @@ def train_model(model_name, check=False):
     print(f"\nTraining model: {model_name}")
     model, training_time = learn_model(model, total_timesteps)
 
-    model.save("models/" + model_name)
+    model.save(f"{out_dir}/{model_name}")
     
     if config.get('wrapper'):
         if config['wrapper'].get('VecNormalize'):
-            env.save(f"models/vec_normalize_{model_name}.pkl")
+            env.save(f"{out_dir}/vec_normalize_{model_name}.pkl")
     env.close()
 
-    output_file = f"models/evaluation_{model_name}.txt"
+    output_file = f"{out_dir}/evaluation_{model_name}.txt"
     with open(output_file, "w") as f:
         f.write(f"Training time: {training_time}\n")
     print(f"Evaluation results saved to {output_file}")

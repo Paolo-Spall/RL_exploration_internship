@@ -6,9 +6,9 @@ from gymnasium.wrappers import RecordVideo
 from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_config, wrap_model_evaluation
 
 
-    ## EVALUATION
+####   EVALUATION
 
-def evaluate_model(model_name, check=False):
+def evaluate_model(model_name, check=False, out_dir="models"):
     config = open_config(model_name)
 
     model_name = config['model_name']
@@ -21,7 +21,9 @@ def evaluate_model(model_name, check=False):
     if check:
         my_checkenv(eval_env, model_name)
 
-    eval_env = wrap_model_evaluation(eval_env, config, model_name=model_name)
+    eval_env = wrap_model_evaluation(eval_env, config, 
+                                     model_name=model_name, 
+                                     out_dir=out_dir)
     
     eval_env.training = False    # does not update them at test time
     eval_env.norm_reward = False # reward normalization is not needed at test time
@@ -30,7 +32,7 @@ def evaluate_model(model_name, check=False):
     
     model_class = get_policy_class(config)
 
-    model = model_class.load(f"models/{model_name}", env=eval_env, device="cpu")
+    model = model_class.load(f"{out_dir}/{model_name}", env=eval_env, device="cpu")
 
     mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=30)
 
@@ -38,7 +40,7 @@ def evaluate_model(model_name, check=False):
 
     print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
 
-    output_file = f"models/evaluation_{model_name}.txt"
+    output_file = f"{out_dir}/evaluation_{model_name}.txt"
     with open(output_file, "a") as f:
         f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")
     print(f"Evaluation results saved to {output_file}")

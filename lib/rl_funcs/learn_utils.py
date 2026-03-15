@@ -103,12 +103,12 @@ def wrap_model(env, config):
         env = VecNormalize(env, **config['wrapper']['VecNormalize'])#, clip_obs=10.)
     return env
 
-def wrap_model_evaluation(env, config, model_name=None):
+def wrap_model_evaluation(env, config, model_name=None, out_dir="models"):
     if config.get('wrapper') == None:
         return env
     wrapper_config = config.get('wrapper')
     if wrapper_config.get('Monitor') or wrapper_config.get('VecMonitor'):
         env = Monitor(env)
     if wrapper_config.get('VecNormalize'):
-        env = VecNormalize.load(f"models/vec_normalize_{model_name}.pkl", env)
+        env = VecNormalize.load(f"{out_dir}/vec_normalize_{model_name}.pkl", env)
     return env

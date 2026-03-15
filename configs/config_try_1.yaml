@@ -34,4 +34,5 @@ wrapper:
   VecNormalize:
     norm_obs: true
     norm_reward: true
+  VecMonitor: true
   VecTransposeImage: false
