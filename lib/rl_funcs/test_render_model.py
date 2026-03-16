@@ -1,15 +1,18 @@
 
 
-from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_config
+from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_model_config
 
 
 
 
 ## RENDER MODEL WITHOUT SAVING VIDEO
 
-def test_render_model(model_name, check=False):
+def test_render_model(model_name, check=False, dir=""):
     """Render model in human mode without saving video"""
-    config = open_config(model_name)
+    if dir:
+        dir = dir.strip("/")+"/"
+
+    config = open_model_config(model_name, dir=dir)
 
     config['env']['render_mode'] = 'human'
     model_name = config['model_name']
@@ -24,7 +27,7 @@ def test_render_model(model_name, check=False):
 
     print("Loading trained model...")
     # Force CPU to avoid CUDA driver/runtime issues when loading the model
-    model = model_class.load(f"models/{model_name}", env=env, device="cpu")
+    model = model_class.load(f"models/{dir}{model_name}", env=env, device="cpu")
     print("Model loaded.")
 
     obs, _ = env.reset()

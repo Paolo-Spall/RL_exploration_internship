@@ -9,7 +9,8 @@ for file in file_list:
         with open(file, 'r') as f:
             config = yaml.safe_load(f)
         
-        config['training']['total_timesteps'] = 500000
+        # config['training']['total_timesteps'] = 500000
+        config['model']['exploration_fraction'] = 0.2
 
         
 

@@ -1,0 +1,36 @@
+env:
+  centroids_obs_len: 10
+  height: 20
+  max_steps: 500
+  obs_spec:
+    ag_pos: true
+    i_gain: false
+    type: absolute
+  obstacle_prob: 0.05
+  perc_range: 3
+  render_mode: null
+  reverse: false
+  sorting: true
+  static_obstacles: true
+  static_obstacles_seed: 42
+  target_discovery_percent: 0.9
+  width: 20
+env_class: MultiObsFrontierEnv
+model:
+  batch_size: 64
+  buffer_size: 50000
+  device: cpu
+  exploration_final_eps: 0.05
+  exploration_fraction: 0.2
+  learning_rate: 0.0005
+  policy: MultiInputPolicy
+  target_update_interval: 500
+  train_freq: 4
+  verbose: 0
+model_class: DQN
+model_name: MultiObsFrontierEnv_absolute_agent_DQN_1e5
+train: true
+training:
+  total_timesteps: 100000
+wrapper:
+  Monitor: true

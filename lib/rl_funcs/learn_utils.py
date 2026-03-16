@@ -58,6 +58,12 @@ def open_config(model_name, save_copy=False, dir=""):
         yaml.dump(config, open(f"models/{dir}config_{model_name}.yaml", 'w'))  # Save a copy of the config in the models folder
     return config
 
+def open_model_config(model_name, save_copy=False, dir=""):
+    config_file = f"models/{dir}config_{model_name}.yaml"
+    with open(config_file, 'r') as f:
+        config = yaml.safe_load(f)
+    return config
+
 
 def get_policy_class(config):
     class_str = config.get('model_class')
