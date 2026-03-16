@@ -43,17 +43,19 @@ class StepMixin:
         if self.is_in_grid(newx, newy):
             self.set_agent_position(newx, newy)
             discovered_cells = self.update_obs_grid()
-            
+
             if discovered_cells == 0:
                 # small penalty for no new discovery
                 #reward -= 2.* self.perception_range / self.total_cells
-                reward -= 1. / self.total_cells 
+                #reward -= 1. / self.total_cells
+                reward -= 0.05 
                 self.detect_frontiers(changed = False) 
             else:
                 self.detect_frontiers(changed = True)
 
                 # reward proportional to new discovered cells
-                reward += discovered_cells / self.total_cells  
+                # reward += discovered_cells / self.total_cells  
+                reward += discovered_cells *0.05  
         else:
             reward = -1  # penalty for invalid move
         
