@@ -21,6 +21,11 @@ class StepMixin:
         
         self.current_step = 0
 
+        #self.stuck_steps = 0
+        self.prev_pos = None
+        self.prev_prev_pos = None
+        self.no_progress_steps = 0
+
         if self.render_mode is not None:#== "human":
             self.render()
 
@@ -36,6 +41,8 @@ class StepMixin:
         terminated = False
         truncated = False
         self.current_step += 1
+
+        old_pos = tuple(self.agent_pos.copy())
         
         newx, newy = next_pos
 
@@ -48,17 +55,42 @@ class StepMixin:
                 # small penalty for no new discovery
                 #reward -= 2.* self.perception_range / self.total_cells
                 #reward -= 1. / self.total_cells
+                self.detect_frontiers(changed = False)
+                self.no_progress_steps += 1
+
                 reward -= 0.05 
-                self.detect_frontiers(changed = False) 
             else:
                 self.detect_frontiers(changed = True)
+                self.no_progress_steps = 0
 
                 # reward proportional to new discovered cells
                 # reward += discovered_cells / self.total_cells  
                 reward += discovered_cells *0.05  
+                
         else:
             reward = -1  # penalty for invalid move
         
+        new_pos = tuple(self.agent_pos.copy())
+
+        # A<->B oscillation penalty
+        if (
+            self.prev_prev_pos is not None
+            and new_pos == self.prev_prev_pos
+            and old_pos == self.prev_pos
+        ):
+            reward -= 0.05
+
+        self.prev_prev_pos = self.prev_pos
+        self.prev_pos = old_pos
+        
+        # no progress for too many steps
+        if self.no_progress_steps >= 20:
+            trunc = True
+            reward -= 0.5
+            if self.render_mode == "human":
+                print("No progress for 20 steps. Exploration truncated.")
+
+
         if (self.discovered_cells / self.total_cells) > self.target_discovery_percent:
             terminated = True
             reward += 1  # big reward for completing exploration

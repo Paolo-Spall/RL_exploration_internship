@@ -85,9 +85,9 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
     def reset(self, seed=None, options=None, init_agent_pos = None):
         super().reset(seed=seed, init_agent_pos = init_agent_pos)
         self.steps = 0
-        self.stuck_steps = 0
         self.discovered_cells = 0
 
+        self.stuck_steps = 0
         self.prev_pos = None
         self.prev_prev_pos = None
         self.no_progress_steps = 0
@@ -161,11 +161,12 @@ class MultiobsSimpleAgentExplorationEnv(ObstGridAgentExplEnv):
         self.visit_count[new_pos[1], new_pos[0]] += 1
 
         self.prev_prev_pos = self.prev_pos
-        self.prev_pos = old_pos
+        self.prev_pos = old_pos ### new_pos???
 
         term = False
         trunc = False
-
+        
+        # no progress for too many steps
         if self.no_progress_steps >= 20:
             trunc = True
             reward -= 0.5
