@@ -85,7 +85,7 @@ class StepMixin:
         
         # no progress for too many steps
         if self.no_progress_steps >= 20:
-            trunc = True
+            truncated = True
             reward -= 0.5
             if self.render_mode == "human":
                 print("No progress for 20 steps. Exploration truncated.")
