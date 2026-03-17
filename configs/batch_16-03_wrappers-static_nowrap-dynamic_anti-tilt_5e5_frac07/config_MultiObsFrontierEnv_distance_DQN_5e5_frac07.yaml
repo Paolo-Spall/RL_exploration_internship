@@ -28,9 +28,9 @@ model:
   train_freq: 4
   verbose: 0
 model_class: DQN
-model_name: MultiObsFrontierEnv_distance_DQN_1e5
+model_name: MultiObsFrontierEnv_distance_DQN_5e5
 train: true
 training:
-  total_timesteps: 100000
+  total_timesteps: 500000
 wrapper:
   Monitor: true
