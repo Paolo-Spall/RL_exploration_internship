@@ -67,7 +67,10 @@ with open(table_file, "w") as f:
     f.write("Model name,Mean reward,Std reward, Elapsed Time\n")
 
 print()
-no_video = input("If you DON'T want to record videos, type 'x': ").strip().lower() == 'x'
+#no_video = input("If you DON'T want to record videos, type 'x': ").strip().lower() == 'x'
+
+#setting by default recording of the video active
+no_video = False
 
 print()
 print("========================================")  
