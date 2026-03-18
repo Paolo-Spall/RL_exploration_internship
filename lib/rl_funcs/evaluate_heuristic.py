@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 
-from lib.rl_funcs.learn_utils import get_policy_class, initialize_env,  wrap_model, my_checkenv, open_config
+from lib.rl_funcs.learn_utils import get_policy_class, initialize_env,  wrap_model, my_checkenv, open_model_config
 
 
     ## EVALUATION
@@ -32,7 +32,7 @@ def run_greedy(env, max_steps, heuristic="distance"):
     return tot_reward
 
 def evaluate_heuristic(model_name, n_episodes=30 ,check=False, heuristic="distance", render=False):
-    config = open_config(model_name)
+    config = open_model_config(model_name)
     config['obs_spec'] = {"ag_pos": False,
                           "i_gain": True,
                           "type": "distance"}

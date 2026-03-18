@@ -8,7 +8,7 @@ import os
 if len(sys.argv) > 1:
     model_names = sys.argv[1:]
 else:
-    model_name = 'MultiObsFrontierEnv_distance_iGain_DQN_1e5'
+    model_name = 'MultiObsFrontierEnv_distance_DQN_dynamic_1e5'
     #'MultiObsFrontierEnv_absolute_DQN_1e5'
 #  'MultiObsFrontierEnv_absolute_agent_DQN_1e5',
 #  'MultiObsFrontierEnv_absolute_iGain_DQN_1e5',

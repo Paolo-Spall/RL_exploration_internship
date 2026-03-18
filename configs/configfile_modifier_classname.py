@@ -9,13 +9,14 @@ for file in file_list:
         with open(file, 'r') as f:
             config = yaml.safe_load(f)
         
-        config['training']['total_timesteps'] = 200000
-        config['model']['exploration_fraction'] = 0.5
-
+        # config['training']['total_timesteps'] = 200000
+        # config['model']['exploration_fraction'] = 0.5
+        config['env_class']= "MultiObsFrontAvoidanceEnv"
+        
         mod_name = config['model_name']
         # # index = mod_name.find('1e5')
         # # new_file_name = file[:index] + 'frac02_' + '2e5' + file[index+3:]
-        new_mod_name = mod_name.replace('_frac07', '')
+        new_mod_name = mod_name.replace('MultiObsFrontierEnv', 'MultiObsFrontAvoidanceEnv')
         config['model_name'] = new_mod_name
         # new_mod_name = mod_name.replace('1e5', '2e5')
 
@@ -26,7 +27,7 @@ for file in file_list:
         # new_file_name = new_file_name.strip('.yaml') + '_frac02' + '.yaml'
         # new_file_name = file.strip('yaml')  + '.yaml'
         
-        new_file_name = file.replace('_frac07', '')
+        new_file_name = file.replace('MultiObsFrontierEnv', 'MultiObsFrontAvoidanceEnv')
         # new_file_name = "config_" + file + "_frac07.yaml"
         os.rename(file, new_file_name)
 
