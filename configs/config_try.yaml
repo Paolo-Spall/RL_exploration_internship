@@ -11,28 +11,26 @@ env:
   render_mode: null
   reverse: false
   sorting: true
-  target_discovery_percent: 0.7
+  static_obstacles: true
+  static_obstacles_seed: 42
+  target_discovery_percent: 0.9
   width: 20
-env_class: MultiObsFrontAvoidanceEnv
+env_class: MultiObsFrontierEnv
 model:
   batch_size: 64
   buffer_size: 50000
   device: cpu
   exploration_final_eps: 0.05
-  exploration_fraction: 0.7
+  exploration_fraction: 0.2
   learning_rate: 0.0005
   policy: MultiInputPolicy
   target_update_interval: 500
   train_freq: 4
   verbose: 0
 model_class: DQN
-model_name: MultiObsFrontAvoidanceEnv_absolute_agent_DQN_1e5
+model_name: MultiObsFrontierEnv_absolute_agent_DQN_1e5
 train: true
 training:
   total_timesteps: 500
 wrapper:
-  VecNormalize:
-    norm_obs: true
-    norm_reward: true
-  VecMonitor: true
-  VecTransposeImage: false
+  Monitor: true

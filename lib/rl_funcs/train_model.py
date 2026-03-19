@@ -42,7 +42,7 @@ def train_model(model_name, check=False, dir=""):
     output_file = f"models/{dir}evaluation_{model_name}.txt"
     with open(output_file, "w") as f:
         f.write(f"Training time: {training_time}\n")
-    print(f"Evaluation results saved to {output_file}")
+        
     return training_time
 
 

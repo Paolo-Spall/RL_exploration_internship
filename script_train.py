@@ -57,14 +57,19 @@ else:
 #     
  
 
-table_file = 'models/' + dir + "/evaluation_results_0.txt"
+table_file = 'models/' + dir + "evaluation_results_0.txt"
 n=0
 while os.path.exists(table_file): 
-    table_file = 'models/' + dir + f"/evaluation_results_{n}.txt"
+    table_file = 'models/' + dir + f"evaluation_results_{n}.txt"
     n+=1
 
-with open(table_file, "w") as f:
-    f.write("Model name,Mean reward,Std reward, Elapsed Time\n")
+csv_file = table_file.replace(".txt", f"_{dir.strip('/')}.csv")
+
+# open both table and csv files for writing and write the header to both
+with open(table_file, "w") as f_table, open(csv_file, "w") as f_csv:
+    header = "Model Name,Mean Reward,Std Reward,Elapsed Time\n"
+    f_table.write(header)
+    f_csv.write(header)
 
 print()
 #no_video = input("If you DON'T want to record videos, type 'x': ").strip().lower() == 'x'
@@ -80,9 +85,10 @@ for model_name in model_names:
     play_sound("/usr/share/sounds/sound-icons/start")
 
     mean_reward, std_reward = evaluate_model(model_name, dir= dir)
-    with open(table_file, "a") as f:
-        f.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{elapsed_time}")
-    
+    with open(table_file, "a") as f_table, open(csv_file, "a") as f_csv:
+        f_table.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{elapsed_time}")
+        f_csv.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{elapsed_time}")
+
     if not no_video:
         record_model_video(
             model_name,
