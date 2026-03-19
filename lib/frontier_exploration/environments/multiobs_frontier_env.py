@@ -61,9 +61,10 @@ if __name__ == "__main__":
     
     truncations = 0
     terminations = 0
-    for obs_type in ['distance']:#['relative', 'absolute', 'distance']:
+    for obs_type in ['relative', 'absolute', 'distance']:#['relative', 'absolute', 'distance']:
         for info_gain in [True, False]:# [True, False]
-            for ag_pos in [False]:# [True, False]
+            for ag_pos in [True, False ]:# [True, False]
+                # input("Press Enter to create the new environment...")
                 #print(f"Obs type: {obs_type}, Info gain: {info_gain}, Agent pos: {ag_pos}")
                 print("Creating environment...")
                 env = MultiObsFrontierEnv(  width=width, 
@@ -71,9 +72,9 @@ if __name__ == "__main__":
                                             obstacle_prob=obstacle_prob, 
                                             target_discovery_percent=target_discovery_percent,
                                             perc_range=perc_range, 
-                                            render_mode= "human", # "human", None,
+                                            render_mode=  "human", # "human", None,
                                             sorting=True,
-                                            reverse=False,
+                                            reverse=True,
                                             obs_spec={'type':obs_type,
                                                     'ag_pos':ag_pos,
                                                     'i_gain':info_gain},
@@ -85,6 +86,9 @@ if __name__ == "__main__":
                 # check_env(env, warn=True)
                 # print("Env checked.")
                 # exit()
+
+                print("obs_spec: ")
+                print(env.obs_spec)
 
                 print("Resetting environment...")
                 obs, _ = env.reset()
@@ -116,11 +120,22 @@ if __name__ == "__main__":
                         mask = centroids == env.padding_value
                         centroids[mask] = np.inf
                         action = np.argmin( centroids )
-                    elif obs_type == 'absolute':
-                        action = np.argmin( np.linalg.norm( centroids - env.agent_pos , axis=1) )
-                    elif obs_type == 'relative':
-                        action = np.argmin( np.linalg.norm( centroids , axis=1) )
+                    else:
+                        padding_element = np.array([env.padding_value, env.padding_value])
+                        mask = np.all(centroids == padding_element, axis=1)
+
+                        if obs_type == 'absolute':
+                            centroids = centroids - env.agent_pos
+
+                        centroids_dist = np.linalg.norm(centroids, axis=1)
+
+                            #action = np.argmin( np.linalg.norm(  , axis=1) )
+                        # elif obs_type == 'relative':
+                        centroids_dist[mask] = np.inf
+                        
+                        action = np.argmin(  centroids_dist  )
                     
+
                     #action = np.random.randint(0, len(centroids))
                     obs, reward, term,  trunc, _ = env.step(action)
 

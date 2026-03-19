@@ -72,18 +72,22 @@ class FrontierDetector:
         self.centroids = centroids
         self.obs_centroids = pad_obs_array(centroids, 
                                        target_shape=(self.centroids_obs_len, 2),
-                                       value = self.padding_value)
+                                       value = self.padding_value,
+                                       reverse=self.reverse)
         self.relative_centroids = pad_obs_array(relative_centroids, 
                                                 target_shape=(self.centroids_obs_len, 2),
-                                                value=self.padding_value)
+                                                value=self.padding_value,
+                                                reverse=self.reverse)
         self.relative_distances = pad_obs_array(relative_distances, 
                                                 target_shape=(self.centroids_obs_len,),
-                                                value=self.padding_value)
+                                                value=self.padding_value,
+                                                reverse=self.reverse)
         self.clusters = clusters
         self.igain = igain
         self.info_gain = pad_obs_array( igain, 
                                     target_shape=(self.centroids_obs_len,),
-                                    value=self.padding_value)
+                                    value=self.padding_value,
+                                    reverse=self.reverse)
 
 class FrontierMixin:
     def frontier_init(self, max_cluster_size):#sort_by='distance', 
@@ -191,13 +195,16 @@ def clusterify(group, max_cluster_size):
             subclusters.append(np.array(cluster))
     return subclusters
 
-def pad_obs_array(array, target_shape=(10,2), value=0):
+def pad_obs_array(array, target_shape=(10,2), value=0, reverse=False):
     padded = np.full(target_shape, value, dtype=array.dtype)
     if array.size == 0:
         return padded
     
     num_centroids = min( array.shape[0], target_shape[0])
-    padded[:num_centroids] = array[:num_centroids]
+    if reverse:
+        padded[-num_centroids:] = array[-num_centroids:]
+    else:
+        padded[:num_centroids] = array[:num_centroids]
     return padded
 
 def render(ax, grid, centroids, clusters):
