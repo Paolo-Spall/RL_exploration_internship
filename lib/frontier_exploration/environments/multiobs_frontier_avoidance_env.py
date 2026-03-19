@@ -39,6 +39,11 @@ class MultiObsFrontAvoidanceEnv(StepMixin, MultiObsFrontBase):
             obs, reward, terminated, truncated, info = super().step(self.agent_pos)
             reward -= 1
             truncated = True
+
+            # render
+            if self.render_mode == "human":
+                print(f"Invalid action = {action}: Selected padding element. Episode truncated.")
+
             return obs, reward, terminated, truncated, info
         
 
