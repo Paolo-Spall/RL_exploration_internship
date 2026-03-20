@@ -9,10 +9,8 @@ env:
   obstacle_prob: 0.05
   perc_range: 3
   render_mode: null
-  reverse: false
+  reverse: true
   sorting: true
-  static_obstacles: true
-  static_obstacles_seed: 42
   target_discovery_percent: 0.9
   width: 20
 env_class: MultiObsFrontAvoidanceEnv
@@ -28,10 +26,10 @@ model:
   train_freq: 4
   verbose: 0
 model_class: DQN
-model_name: MultiObsFrontAvoidanceEnv_absolute_agent_DQN_5e5_reverse
-reverse: true
+model_name: MultiObsFrontAvoidanceEnv_absolute_agent_DQN_dynamic_2e5_frac07_reverse
 train: true
 training:
   total_timesteps: 500
+  log_interval: 100
 wrapper:
   Monitor: true

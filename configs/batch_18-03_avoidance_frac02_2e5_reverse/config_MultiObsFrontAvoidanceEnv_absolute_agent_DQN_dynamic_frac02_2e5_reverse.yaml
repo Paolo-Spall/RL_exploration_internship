@@ -29,6 +29,7 @@ model_class: DQN
 model_name: MultiObsFrontAvoidanceEnv_absolute_agent_DQN_dynamic_frac02_2e5_reverse
 train: true
 training:
+  log_interval: 100
   total_timesteps: 200000
 wrapper:
   Monitor: true

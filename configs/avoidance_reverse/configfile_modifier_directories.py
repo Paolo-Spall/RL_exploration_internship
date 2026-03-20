@@ -19,19 +19,19 @@ for directory in dir_list:
                 
                 #config['training']['total_timesteps'] = 1000000
                 #config['model']['exploration_fraction'] = 0.5
-                config['env']['reverse'] = True
-
+                # config['env']['reverse'] = True
+                config['training']['log_interval'] = 100
                 # delete the item with key 'reverse' of dict config:
-                if 'reverse' in config:
-                    del config['reverse'] 
+                # if 'reverse' in config:
+                #     del config['reverse'] 
 
-                mod_name = config['model_name']
+                # mod_name = config['model_name']
                 # # index = mod_name.find('1e5')
                 # # new_file_name = file[:index] + 'frac02_' + '2e5' + file[index+3:]
                 # new_mod_name = mod_name.replace('_frac07', '')
                 
                 #new_mod_name = mod_name.replace('5e5', '1e6')
-                new_mod_name = mod_name + '_reverse'
+                # new_mod_name = mod_name + '_reverse'
                 #config['model_name'] = new_mod_name
 
                 # index = file.find('frac07')

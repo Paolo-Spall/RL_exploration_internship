@@ -1,11 +1,19 @@
 
+from math import log
+
 from lib.rl_funcs.learn_utils import training_time_monitor, get_policy_class, initialize_env,  wrap_model, my_checkenv, open_config
 
 
 
 @training_time_monitor
-def learn_model(model, total_timesteps):
-    model.learn(total_timesteps=total_timesteps )
+def learn_model(model, training_config):
+    # total_timesteps = training_config['total_timesteps']
+    # log_interval = training_config.get('log_interval')
+    model.learn(**training_config)
+    # if log_interval is not None:
+    #     model.learn(total_timesteps=total_timesteps, log_interval=log_interval)
+    # else:
+    #     model.learn(total_timesteps=total_timesteps )
     return model
 
 def train_model(model_name, check=False, dir=""):
@@ -24,13 +32,16 @@ def train_model(model_name, check=False, dir=""):
     #env = TimeLimit(env, max_episode_steps=100)
 
     #   CREATE RL MODEL
+    config['model']['tensorboard_log'] = f"./models/{dir}tb_logs_{model_name}/"
+
     model_class = get_policy_class(config)
     model = model_class( env=env, **config['model']  )
 
-    total_timesteps = config['training']['total_timesteps']
+    #total_timesteps = config['training']['total_timesteps']
+    training_config = config['training']
     
     print(f"\nTraining model: {model_name}")
-    model, training_time = learn_model(model, total_timesteps)
+    model, training_time = learn_model(model, training_config)
 
     model.save(f"models/{dir}{model_name}")
     
