@@ -7,4 +7,3 @@ PyYAML==6.0.3
 stable_baselines3==2.7.0
 imageio[ffmpeg]
 imageio[ffmpeg]
-tensorboard==2.20.0
