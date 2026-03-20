@@ -9,7 +9,7 @@ env:
   obstacle_prob: 0.05
   perc_range: 3
   render_mode: null
-  reverse: false
+  reverse: true
   sorting: true
   target_discovery_percent: 0.9
   width: 20
@@ -27,7 +27,6 @@ model:
   verbose: 0
 model_class: DQN
 model_name: MultiObsFrontAvoidanceEnv_relative_DQN_dynamic_5e5_reverse
-reverse: true
 train: true
 training:
   total_timesteps: 500000

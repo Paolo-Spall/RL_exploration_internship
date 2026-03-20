@@ -11,14 +11,14 @@ if len(sys.argv) >= 2:
     else:
         dir = ""
 else:
-    model_name = "MultiObsFrontAvoidanceEnv_distance_DQN_dynamic_2e5_frac07"
+    model_name = "MultiObsFrontAvoidanceEnv_relative_DQN_2e5_frac07_reverse"
 # MultiObsFrontierEnv_relative_DQN_5e5,16.78,0.50,01:10:19
 # MultiObsFrontierEnv_distance_DQN_5e5,16.91,0.61,01:10:05
 # MultiObsFrontierEnv_distance_DQN_dynamic_5e5,7.07,3.92,00:49:55
 # MultiObsFrontierEnv_relative_DQN_dynamic_5e5,16.93,0.48,01:09:17
 # MultiObsFrontierEnv_absolute_agent_DQN_5e5,15.92,1.80,00:48:53
 # MultiObsFrontierEnv_absolute_agent_DQN_dynamic_5e5,16.46,1.52,00:58:35
-    dir = "batch_18-03_avoidance_frac07_2e5"
+    dir = "batch_18-03_avoidance_frac07_2e5_reverse"
 
 test_render_model(model_name, dir=dir)
 
