@@ -118,8 +118,8 @@ def render_path(grid, path, start, goal):
         Patch(facecolor='black', edgecolor='gray', linewidth=0.5, label='Occupied cells')
     ]
     
-    ax_env.legend(handles=legend_elements, loc='upper right', fontsize=15, 
-                  framealpha=0.95, edgecolor='black', fancybox=True, shadow=True)
+    ax_env.legend(handles=legend_elements, loc='upper right', fontsize=11, 
+                  framealpha=0.95, edgecolor='black')
     
     # Set title and labels
     ax_env.set_title("A* obstacle avoidance path planner", fontsize=16, fontweight='bold', pad=20)

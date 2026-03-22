@@ -2,11 +2,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
 if __name__ == "__main__":
     import sys
     sys.path.append(".")
 from lib.frontier_exploration.planning.planning_utils import is_in_grid, is_obstacle, render_path
 from lib.utils import find_agent
+from lib.grid_env.obst_grid_agent_env import ObstGridAgentEnv
 
 class ObstAvoidance:
     def __init__(self, obst_code, moves):
@@ -115,12 +118,30 @@ if __name__ == "__main__":
              np.array([0, -1])]  # Move down (negative y)
     import joblib
 
-
-    file ='frontiers_grid.joblib'
-    print("Rendering from file:", file)
-    obs_grid, clusters, centroids = joblib.load(file)
-    agent = find_agent(obs_grid, agent_color=255)
-    goal = np.array([9, 17])
+    env = ObstGridAgentEnv(width=20, height=20, obstacle_prob=0.085, render_mode="human")
+    env.reset(seed=1, init_agent_pos=(3,5))
+    env.update_obs_grid()
+    obs_grid = env.obs_grid
+    obs_grid[obs_grid == 255] = 0
+    goal = np.array([14, 18])
+    agent = env.agent_pos
+    #env.render()
+    #plt.show()
+    #input()
+    #exit()
     path = compute_path(obs_grid, agent, goal, 170, moves)
-    render_path(obs_grid, path, agent, goal)
+    fig, ax = render_path(obs_grid, path, agent, goal)
+    fig.savefig('images/path_planning.pdf', bbox_inches='tight')
+
+    # for file in ["frontiers_grid.joblib", 
+    #              "frontiers_grid_1.joblib",
+    #              "frontiers_grid_2.joblib"]:    
+    #     #file ='frontiers_grid.joblib'
+    #     print("Rendering from file:", file)
+    #     obs_grid, clusters, centroids = joblib.load(file)
+    #     agent = find_agent(obs_grid, agent_color=255)
+    #     goal = np.array([9, 17])
+    #     path = compute_path(obs_grid, agent, goal, 170, moves)
+    #     render_path(obs_grid, path, agent, goal)
+    
     plt.show()

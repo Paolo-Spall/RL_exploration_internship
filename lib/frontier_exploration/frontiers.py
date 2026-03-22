@@ -19,6 +19,7 @@ class FrontierDetector:
                  unknown_color=255,
                  centroids_obs_len=10,
                  max_cluster_size=10,
+                 padding_value=-1,
                  sorting=True,
                  reverse=False ):
         
@@ -28,6 +29,7 @@ class FrontierDetector:
         self.max_cluster_size = max_cluster_size
         self.sorting = sorting
         self.reverse = reverse
+        self.padding_value = padding_value
 
         self.max_relative = max(height, width)
         self.max_distance = int(np.sqrt(height**2 + width**2))
