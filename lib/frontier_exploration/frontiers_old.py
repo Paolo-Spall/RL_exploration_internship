@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
 
 if __name__ == "__main__":
     import sys
@@ -11,9 +8,6 @@ if __name__ == "__main__":
 
 from lib.grid_env.obst_grid_gen import is_in_grid
 from lib.utils import argsort_by_distance
-from lib.frontier_exploration.frontiers_rendering import render_frontiers, \
-    render_frontiers_comparison,\
-    render_frontiers_comparison_with_bboxes
 
 
 
@@ -227,74 +221,109 @@ def find_agent(grid, agent_color=255):
         return None
     return positions[0][::-1]  # return (x,y)
 
-
+def render_frontiers(grid, centroids, clusters, agent_pos):
+    """
+    Render a path on a grid with professional thesis-quality visualization.
+    
+    Parameters:
+    -----------
+    grid : np.ndarray
+        2D grid where occupied cells = 1 (black) and free cells = 0 (white)
+    path : list
+        List of waypoints representing the planned path
+    start : np.ndarray
+        Starting position [x, y]
+    goal : np.ndarray
+        Goal/target position [x, y]
+    """
+    # Create figure with high DPI for thesis quality
+    fig, ax_env = plt.subplots(1, 1, figsize=(12, 10), dpi=150)
+    
+    
+    
+    # Display grid with meaningful colors
+    # Create a custom visualization of the grid
+    ax_env.imshow(grid, cmap='Greys', origin='upper', vmin=0, vmax=1)
+    
+    # Add grid lines for better visibility
+    height, width = grid.shape
+    for i in np.arange(-0.5, height, 1):
+        ax_env.axhline(y=i, color='gray', linewidth=0.5, alpha=0.3)
+    for j in np.arange(-0.5, width, 1):
+        ax_env.axvline(x=j, color='gray', linewidth=0.5, alpha=0.3)
+    
+    
+    
+    # Plot start position (agent)
+    ax_env.scatter(agent_pos[0], agent_pos[1], c='#06A77D', s=300, marker='o', 
+                   edgecolors='black', linewidth=2, label='Agent', zorder=4)
+    
+    
+    # Create custom legend for grid cells
+    from matplotlib.patches import Patch
+    legend_elements = [
+        ax_env.get_legend_handles_labels()[0][0],  # Path
+        ax_env.get_legend_handles_labels()[0][1],  # Agent
+        ax_env.get_legend_handles_labels()[0][2],  # Target position
+        Patch(facecolor='white', edgecolor='black', linewidth=1.5, label='Free cells'),
+        Patch(facecolor='black', edgecolor='gray', linewidth=0.5, label='Occupied cells')
+    ]
+    
+    ax_env.legend(handles=legend_elements, loc='upper right', fontsize=15, 
+                  framealpha=0.95, edgecolor='black', fancybox=True, shadow=True)
+    
+    # Set title and labels
+    ax_env.set_title("Frontiers cells and clusters ", fontsize=16, fontweight='bold', pad=20)
+    ax_env.set_xlabel('X coordinate (cells)', fontsize=12, fontweight='bold')
+    ax_env.set_ylabel('Y coordinate (cells)', fontsize=12, fontweight='bold')
+    
+    # Set axis limits and ticks for better appearance
+    ax_env.set_xlim(-0.5, width - 0.5)
+    ax_env.set_ylim(height - 0.5, -0.5)
+    ax_env.set_xticks(np.arange(0, width, max(1, width // 10)))
+    ax_env.set_yticks(np.arange(0, height, max(1, height // 10)))
+    ax_env.tick_params(labelsize=10)
+    
+    # Adjust layout to prevent label cutoff
+    plt.tight_layout()
+    
+    return fig, ax_env
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import joblib
-    
-    file = 'files/frontiers_grid_6.joblib'
-    obs_grid, clusters, centroids = joblib.load(file)
-    obs_grid[obs_grid == 255] = 0
-    agent_pos = np.array([15, 15])
-    
-    # Create splitted clusters
-    split_clusters = split_clusters_list(clusters, max_cluster_size=15)
-    split_centroids = np.array([c.mean(axis=0) for c in split_clusters])
-    
-    # Render with thesis style
-    fig, (ax_orig, ax_split) = render_frontiers_comparison_with_bboxes(
-        obs_grid, 
-        centroids, 
-        clusters, 
-        split_centroids, 
-        split_clusters, 
-        agent_pos,
-        legend_rl='right'
-    )
-    fig.savefig('images/frontiers_comparison_6_boxes.pdf', bbox_inches='tight')
-    plt.show()
 
-###########################################
-    # for i, (file, rl) in enumerate([('files/frontiers_grid_0.joblib', 'left'),
-    #                                 ('files/frontiers_grid_6.joblib', 'right')]):
-                 
-    #     print("Rendering from file:", file)
-    #     obs_grid, clusters, centroids = joblib.load(file)
-         
-    #     #     obs_grid[1,7] = 170
-    #     #     obs_grid[1,8] = 170
-    #     #     frontiers = find_frontiers(obs_grid, 85, 0)
-    #     #     centroids, cluster, igain = cluster_frontiers(frontiers, max_cluster_size=30)
-    #     agent_pos = find_agent(obs_grid, agent_color=255)
-    #     if i == 0:
-    #         agent_pos = np.array([15,15])
-    #     fig, ax = render_frontiers(obs_grid, centroids, clusters, agent_pos, rl=rl)
-    #     fig.savefig(f'images/frontiers_{i}.pdf', bbox_inches='tight')
-        # fig, (ax_orig, ax_split, ax_fromscratch) = plt.subplots(1,3)
 
-        # #titoling the plots
-        # ax_orig.set_title("Not splitted")
-        # render(ax_orig, obs_grid, centroids, clusters)
+    for file in ['files/frontiers_grid_0.joblib',
+                 'files/frontiers_grid_1.joblib',
+                 'files/frontiers_grid_2.joblib',]:
+        print("Rendering from file:", file)
+        obs_grid, clusters, centroids = joblib.load(file)
+
+        fig, (ax_orig, ax_split, ax_fromscratch) = plt.subplots(1,3)
+
+        #titoling the plots
+        ax_orig.set_title("Not splitted")
+        render(ax_orig, obs_grid, centroids, clusters)
         
 
-        # ax_split.set_title("Original clusters splitted")
-        # split_clusters = split_clusters_list(clusters, max_cluster_size=15)
-        # split_centroids = np.array([c.mean(axis=0) for c in split_clusters])
-        # render(ax_split, obs_grid, split_centroids, split_clusters)
+        ax_split.set_title("Original clusters splitted")
+        split_clusters = split_clusters_list(clusters, max_cluster_size=15)
+        split_centroids = np.array([c.mean(axis=0) for c in split_clusters])
+        render(ax_split, obs_grid, split_centroids, split_clusters)
 
 
-        # ax_fromscratch.set_title("Computed with splitting")
-        # agent_pos = find_agent(obs_grid, agent_color=255)
+        ax_fromscratch.set_title("Computed with splitting")
+        agent_pos = find_agent(obs_grid, agent_color=255)
         
-        # detector = FrontierDetector(obs_grid.shape[0],
-        #                 obs_grid.shape[1],
-        #                 free_color=0, 
-        #                 unknown_color=85,
-        #                 max_cluster_size=15)
+        detector = FrontierDetector(obs_grid.shape[0],
+                        obs_grid.shape[1],
+                        free_color=0, 
+                        unknown_color=85,
+                        max_cluster_size=15)
         
-        # detector.detect_frontiers(obs_grid, agent_pos=agent_pos)
-        # render(ax_fromscratch, obs_grid, detector.centroids, detector.clusters)
+        detector.detect_frontiers(obs_grid, agent_pos=agent_pos)
+        render(ax_fromscratch, obs_grid, detector.centroids, detector.clusters)
 
-        # plt.show()
+        plt.show()
     

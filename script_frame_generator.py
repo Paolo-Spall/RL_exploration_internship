@@ -1,6 +1,9 @@
 #!/usr/bin/python3
+from fileinput import filename
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+import joblib
 
 
 
@@ -14,7 +17,7 @@ from lib.frontier_exploration.environments import MultiObsFrontierEnv
 
 if __name__ == "__main__":
     width, height = 20, 20
-    obstacle_prob = 0.07
+    obstacle_prob = 0.035
     target_discovery_percent = 0.9
     perc_range = 3
     
@@ -31,6 +34,7 @@ if __name__ == "__main__":
                                 obstacle_prob=obstacle_prob, 
                                 target_discovery_percent=target_discovery_percent,
                                 perc_range=perc_range, 
+                                max_front_cluster_size=20,
                                 render_mode=  "human", # "human", None,
                                 sorting=True,
                                 reverse=False,
@@ -38,14 +42,29 @@ if __name__ == "__main__":
                                         'ag_pos':ag_pos,
                                         'i_gain':info_gain},
                                 static_obstacles=True,
-                                static_obstacles_seed=42
+                                static_obstacles_seed=44
                                 )
-    env.reset( init_agent_pos=(9,10))
+    env.reset( init_agent_pos=(11,11))
     #env.agent_pos = np.array((13,8))
     cont = 0
-    while cont<10:
+
+    savecont = 0
+
+    
+
+    while cont<50:
         env.step(0)
-        input()
+        save = input('save?')
+        if save == 'y':
+            while os.path.exists(f'files/frontiers_grid_{savecont}.joblib'):
+                savecont += 1
+            filename = f'files/frontiers_grid_{savecont}.joblib'
+            joblib.dump([env.obs_grid,
+                        env.clusters,
+                        env.centroids],
+                    filename)
+            print(f"Saved to {filename}")
+            savecont +=1
         cont+=1
 # import joblib 
 # env.init_simulation_render()
