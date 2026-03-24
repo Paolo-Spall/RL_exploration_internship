@@ -17,21 +17,20 @@ env:
   width: 20
 env_class: MultiObsFrontierEnv
 model:
-  batch_size: 128
-  buffer_size: 100000
+  batch_size: 64
+  buffer_size: 50000
   device: cpu
   exploration_final_eps: 0.05
   exploration_fraction: 0.7
-  learning_rate: 0.0001
-  max_grad_norm: 10
+  learning_rate: 5.0e-05
   policy: MlpPolicy
-  target_update_interval: 2000
+  target_update_interval: 500
   train_freq: 4
   verbose: 0
 model_class: DQN
-model_name: relative_5e5_frac07_best_guesses_frac07
+model_name: relative_1p5e6_frac07_lr15e-5
 train: true
 training:
-  total_timesteps: 500000
+  total_timesteps: 1500000
 wrapper:
   Monitor: true
