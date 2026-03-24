@@ -37,7 +37,12 @@ class MultiObsFrontAvoidanceEnv(StepMixin, MultiObsFrontBase):
         
         if np.all(target_centroid == self.padding_value):
             obs, reward, terminated, truncated, info = super().step(self.agent_pos)
-            reward -= 1
+            if self.padding_penalty:
+                reward -= 1
+            else:
+                # if not flagged only truncation, no penalty
+                pass
+            
             truncated = True
 
             # render

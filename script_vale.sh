@@ -1,3 +1,3 @@
 #!/usr/bin/bash
-python3 script_train.py -dir batch_18-03_avoidance_1e6_frac02
-python3 script_train.py -dir batch_18-03_avoidance_1e6_frac05
+python3 script_train.py -dir batch_24-03_relative_shorters_nopadtrunc_lr15e-5
+python3 script_train.py -dir batch_24-03_relative_shorters_obstacles_nopadtrunc_lr15e-5
