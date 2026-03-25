@@ -15,6 +15,7 @@ env:
   static_obstacles_seed: 42
   target_discovery_percent: 0.9
   width: 20
+  padding_value: -1
 env_class: MultiObsFrontAvoidanceEnv
 model:
   batch_size: 64
