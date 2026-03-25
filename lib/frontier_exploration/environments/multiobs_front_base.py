@@ -49,7 +49,7 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
                            'only_igain':False},
                  sorting=True,
                  reverse=False,
-                 padding_at_end=False,
+                 padding_at_end=True,
                  padding_value=0. ,
                  static_obstacles=False,
                  static_obstacles_seed=None,
