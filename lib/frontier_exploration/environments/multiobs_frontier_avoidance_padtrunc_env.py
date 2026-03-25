@@ -125,6 +125,7 @@ if __name__ == "__main__":
 
                 term = False
                 trunc = False
+                action = 0
 
                 while not term and not trunc:
                     if ag_pos:
@@ -160,11 +161,17 @@ if __name__ == "__main__":
                         # elif obs_type == 'relative':
                         centroids_dist[mask] = np.inf
                         
-                        action = np.argmin(  centroids_dist  )
+                        #action = np.argmin(  centroids_dist  )
                     
 
                     #action = np.random.randint(0, len(centroids))
-                    obs, reward, term,  trunc, _ = env.step(action=9)
+                    
+                    obs, reward, term,  trunc, _ = env.step(action=action)
+                    print(f"Action: {action}, Step reward: {reward}")
+                    if action==0:
+                        action=1
+                    elif action==1:
+                        action=0
 
                 if trunc:
                     truncations += 1
