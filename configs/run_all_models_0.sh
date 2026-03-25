@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+python3 script_train.py Avoidance_absolute_iGain_static_1e5
+python3 script_train.py Avoidance_absolute_agent_iGain_static_1e5
+python3 script_train.py Avoidance_absolute_static_1e5
+python3 script_train.py Avoidance_absolute_agent_static_1e5
+python3 script_train.py Avoidance_relative_iGain_static_1e5
+python3 script_train.py Avoidance_relative_agent_iGain_static_1e5
+python3 script_train.py Avoidance_relative_static_1e5
+python3 script_train.py Avoidance_relative_agent_static_1e5

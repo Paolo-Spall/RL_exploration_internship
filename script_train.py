@@ -67,7 +67,7 @@ csv_file = table_file.replace(".txt", f"_{dir.strip('/')}.csv")
 
 # open both table and csv files for writing and write the header to both
 with open(table_file, "w") as f_table, open(csv_file, "w") as f_csv:
-    header = "Model Name,Mean Reward,Std Reward,Elapsed Time\n"
+    header = "Model Name,Mean Reward,Std Reward,Mean Action,Std Action,Elapsed Time\n"
     f_table.write(header)
     f_csv.write(header)
 
@@ -84,10 +84,10 @@ for model_name in model_names:
     elapsed_time = train_model(model_name ,check=True, dir=dir)
     play_sound("/usr/share/sounds/sound-icons/start")
 
-    mean_reward, std_reward = evaluate_model(model_name, dir= dir)
+    mean_reward, std_reward, mean_action, std_action = evaluate_model(model_name, dir= dir)
     with open(table_file, "a") as f_table, open(csv_file, "a") as f_csv:
-        f_table.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{elapsed_time}")
-        f_csv.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{elapsed_time}")
+        f_table.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{mean_action:.4f},{std_action:.4f},{elapsed_time}")
+        f_csv.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{mean_action:.4f},{std_action:.4f},{elapsed_time}")
 
     if not no_video:
         record_model_video(

@@ -4,14 +4,14 @@ import pprint
 import os
 
 filename = "config_template.yaml"
-filedir = "configs/"
+filedir = "./"
 
 with open(filedir + filename, 'r') as file:
     config = yaml.safe_load(file)
 
 model_name_list = []
 
-for obs_type in [ 'absolute', 'relative','distance']:
+for obs_type in [ 'absolute', 'relative',]:#'distance']:
     for info_gain in [True, False]:
         for ag_pos in [False, True]:
             config['env_class'] = "MultiObsFrontAvoidanceEnv"
@@ -20,13 +20,14 @@ for obs_type in [ 'absolute', 'relative','distance']:
             config['env']['obs_spec'] = {'type': obs_type,
                                       'ag_pos': ag_pos,
                                       'i_gain': info_gain}
-            model_name = "MultiObsFrontAvoidanceEnv_"
+            model_name = "Avoidance_"
             model_name += f"{obs_type}_"
             if ag_pos:
                 model_name += "agent_"
             if info_gain:
                 model_name += "iGain_"
-            model_name += "DQN_1e5"
+            model_name += "static_"
+            model_name += "1e5"
             config['model_name'] = model_name
             if ag_pos:
                 config['model']['policy'] = 'MultiInputPolicy'

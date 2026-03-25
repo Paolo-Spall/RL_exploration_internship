@@ -51,7 +51,7 @@ while os.path.exists(table_file):
     n+=1
 
 with open(table_file, "w") as f:
-    f.write("Model name,Mean reward,Std reward, Elapsed Time\n")
+    f.write("Model name,Mean reward,Std reward,Mean action,Std action\n")
 
 print()
 no_video = input("If you DON'T want to record videos, type 'x': ").strip().lower() == 'x'
@@ -61,9 +61,9 @@ print("========================================")
 
 for model_name in model_names:
 
-    mean_reward, std_reward = evaluate_model(model_name)
+    mean_reward, std_reward, mean_action, std_action = evaluate_model(model_name)
     with open(table_file, "a") as f:
-        f.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f}")
+        f.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{mean_action:.4f},{std_action:.4f}")
     
     if not no_video:
         record_model_video(

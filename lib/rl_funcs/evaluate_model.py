@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 from stable_baselines3.common.evaluation import evaluate_policy
 from gymnasium.wrappers import RecordVideo
@@ -7,6 +8,46 @@ from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checke
 
 
 ####   EVALUATION
+
+def evaluate_action_stats(model, env, n_eval_episodes=10):
+    """
+    Evaluate and return statistics about actions selected by the model.
+    
+    Args:
+        model: The trained model
+        env: The evaluation environment
+        n_eval_episodes: Number of episodes to evaluate
+        
+    Returns:
+        dict: Statistics including mean, std, min, max of actions and action distribution
+    """
+    all_actions = []
+    
+    for _ in range(n_eval_episodes):
+        obs, _ = env.reset()
+        done = False
+        
+        while not done:
+            action, _ = model.predict(obs, deterministic=True)
+            all_actions.append(action)
+            obs, reward, terminated, truncated, _ = env.step(action)
+            done = terminated or truncated
+    
+    all_actions = np.array(all_actions)
+    
+    action_stats = {
+        'mean_action': float(np.mean(all_actions)),
+        'std_action': float(np.std(all_actions)),
+        'min_action': float(np.min(all_actions)),
+        'max_action': float(np.max(all_actions)),
+    }
+    
+    # If discrete action space, add distribution
+    if len(all_actions.shape) == 1:  # Discrete actions
+        unique, counts = np.unique(all_actions, return_counts=True)
+        action_stats['action_distribution'] = {int(a): int(c) for a, c in zip(unique, counts)}
+    
+    return action_stats
 
 def evaluate_model(model_name, check=False, dir=""):
     config = open_config(model_name, dir=dir)
@@ -36,17 +77,29 @@ def evaluate_model(model_name, check=False, dir=""):
 
     mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=30)
 
+    # Evaluate action statistics
+    action_stats = evaluate_action_stats(model, eval_env)
+
     eval_env.close()
 
     print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
+    print(f"Action stats: mean = {action_stats['mean_action']:.4f} +/- {action_stats['std_action']:.4f}")
 
     output_file = f"models/{dir}evaluation_{model_name}.txt"
     with open(output_file, "a") as f:
         f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")
+        f.write(f"Action statistics:\n")
+        f.write(f"  Mean action: {action_stats['mean_action']:.4f}\n")
+        f.write(f"  Std action: {action_stats['std_action']:.4f}\n")
+        f.write(f"  Min action: {action_stats['min_action']:.4f}\n")
+        f.write(f"  Max action: {action_stats['max_action']:.4f}\n")
+        if 'action_distribution' in action_stats:
+            f.write(f"  Action distribution: {action_stats['action_distribution']}\n")
+        f.write("\n")
     print(f"Evaluation results saved to {output_file}")
 
-    return mean_reward, std_reward
+    return mean_reward, std_reward, action_stats['mean_action'], action_stats['std_action']
 
 if __name__ == "__main__":
     config_file = "configs/config_ex.yaml"
-    evaluate_model(config_file)
+    mean_reward, std_reward, mean_action, std_action = evaluate_model(config_file)
