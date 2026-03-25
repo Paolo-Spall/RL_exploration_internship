@@ -9,7 +9,7 @@ from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checke
 
 ####   EVALUATION
 
-def evaluate_action_stats(model, env, n_eval_episodes=10):
+def evaluate_action_stats(model, env, n_eval_episodes=30):
     """
     Evaluate and return statistics about actions selected by the model.
     
@@ -19,9 +19,12 @@ def evaluate_action_stats(model, env, n_eval_episodes=10):
         n_eval_episodes: Number of episodes to evaluate
         
     Returns:
-        dict: Statistics including mean, std, min, max of actions and action distribution
+        dict: Statistics including mean, std, min, max of actions, action distribution,
+              and episode termination/truncation counts
     """
     all_actions = []
+    num_terminations = 0
+    num_truncations = 0
     
     for _ in range(n_eval_episodes):
         obs, _ = env.reset()
@@ -32,6 +35,12 @@ def evaluate_action_stats(model, env, n_eval_episodes=10):
             all_actions.append(action)
             obs, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
+        
+        # Track termination vs truncation
+        if terminated:
+            num_terminations += 1
+        elif truncated:
+            num_truncations += 1
     
     all_actions = np.array(all_actions)
     
@@ -40,12 +49,16 @@ def evaluate_action_stats(model, env, n_eval_episodes=10):
         'std_action': float(np.std(all_actions)),
         'min_action': float(np.min(all_actions)),
         'max_action': float(np.max(all_actions)),
+        'num_terminations': num_terminations,
+        'num_truncations': num_truncations,
+        'termination_rate': float(num_terminations / n_eval_episodes),
     }
     
     # If discrete action space, add distribution
     if len(all_actions.shape) == 1:  # Discrete actions
         unique, counts = np.unique(all_actions, return_counts=True)
-        action_stats['action_distribution'] = {int(a): int(c) for a, c in zip(unique, counts)}
+        total_actions = len(all_actions)
+        action_stats['action_distribution'] = {int(a): float(c / total_actions) for a, c in zip(unique, counts)}
     
     return action_stats
 
@@ -101,6 +114,9 @@ def evaluate_model(model_name, check=False, dir="", notrunc_flag=False):
         f.write(f"  Max action: {action_stats['max_action']:.4f}\n")
         if 'action_distribution' in action_stats:
             f.write(f"  Action distribution: {action_stats['action_distribution']}\n")
+        f.write(f"Episode statistics:\n")
+        f.write(f"  Terminations: {action_stats['num_terminations']}/30 ({action_stats['termination_rate']:.2%})\n")
+        f.write(f"  Truncations: {action_stats['num_truncations']}/30\n")
         f.write("\n")
     print(f"Evaluation results saved to {output_file}")
 
