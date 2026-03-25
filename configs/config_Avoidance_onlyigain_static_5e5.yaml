@@ -5,12 +5,12 @@ env:
   obs_spec:
     ag_pos: false
     i_gain: false
-    type: relative
+    type: absolute
+    only_igain: true
   obstacle_prob: 0.05
   perc_range: 3
   render_mode: null
-  reverse: true
-  padding_at_end: true
+  reverse: false
   sorting: true
   static_obstacles: true
   static_obstacles_seed: 42
@@ -32,6 +32,6 @@ model_class: DQN
 model_name: Avoidance_relative_static_5e5
 train: true
 training:
-  total_timesteps: 500000
+  total_timesteps: 500
 wrapper:
   Monitor: true

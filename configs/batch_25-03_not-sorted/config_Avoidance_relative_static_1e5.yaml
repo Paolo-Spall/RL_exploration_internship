@@ -9,9 +9,10 @@ env:
   obstacle_prob: 0.05
   perc_range: 3
   render_mode: null
-  reverse: true
-  padding_at_end: true 
-  sorting: true
+  reverse: false
+  sorting: false
+  static_obstacles: true
+  static_obstacles_seed: 42
   target_discovery_percent: 0.9
   width: 20
 env_class: MultiObsFrontAvoidanceEnv
@@ -27,9 +28,9 @@ model:
   train_freq: 4
   verbose: 0
 model_class: DQN
-model_name: Avoidance_relative_dynamic_5e5
+model_name: Avoidance_relative_static_1e5
 train: true
 training:
-  total_timesteps: 500000
+  total_timesteps: 100000
 wrapper:
   Monitor: true
