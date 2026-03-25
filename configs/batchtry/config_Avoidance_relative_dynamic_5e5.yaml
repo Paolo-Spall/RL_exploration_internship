@@ -9,7 +9,8 @@ env:
   obstacle_prob: 0.05
   perc_range: 3
   render_mode: null
-  reverse: false
+  reverse: true
+  padding_at_end: true 
   sorting: true
   target_discovery_percent: 0.9
   width: 20

@@ -27,7 +27,8 @@ class FrontierDetector:
                  max_cluster_size=10,
                  padding_value=-1,
                  sorting=True,
-                 reverse=False ):
+                 reverse=False,
+                 padding_at_end=False ):
         
         self.free_color = free_color
         self.unknown_color = unknown_color
@@ -36,6 +37,7 @@ class FrontierDetector:
         self.sorting = sorting
         self.reverse = reverse
         self.padding_value = padding_value
+        self.padding_at_end = padding_at_end
 
         self.max_relative = max(height, width)
         self.max_distance = int(np.sqrt(height**2 + width**2))
@@ -81,21 +83,21 @@ class FrontierDetector:
         self.obs_centroids = pad_obs_array(centroids, 
                                        target_shape=(self.centroids_obs_len, 2),
                                        value = self.padding_value,
-                                       reverse=self.reverse)
+                                       padding_at_end=self.padding_at_end)
         self.relative_centroids = pad_obs_array(relative_centroids, 
                                                 target_shape=(self.centroids_obs_len, 2),
                                                 value=self.padding_value,
-                                                reverse=self.reverse)
+                                                padding_at_end=self.padding_at_end)
         self.relative_distances = pad_obs_array(relative_distances, 
                                                 target_shape=(self.centroids_obs_len,),
                                                 value=self.padding_value,
-                                                reverse=self.reverse)
+                                                padding_at_end=self.padding_at_end)
         self.clusters = clusters
         self.igain = igain
         self.info_gain = pad_obs_array( igain, 
                                     target_shape=(self.centroids_obs_len,),
                                     value=self.padding_value,
-                                    reverse=self.reverse)
+                                    padding_at_end=self.padding_at_end)
 
 class FrontierMixin:
     def frontier_init(self, max_cluster_size):#sort_by='distance', 
@@ -203,16 +205,16 @@ def clusterify(group, max_cluster_size):
             subclusters.append(np.array(cluster))
     return subclusters
 
-def pad_obs_array(array, target_shape=(10,2), value=0, reverse=False):
+def pad_obs_array(array, target_shape=(10,2), value=0, padding_at_end=False):
     padded = np.full(target_shape, value, dtype=array.dtype)
     if array.size == 0:
         return padded
     
     num_centroids = min( array.shape[0], target_shape[0])
-    if reverse:
-        padded[-num_centroids:] = array[-num_centroids:]
-    else:
+    if padding_at_end:
         padded[:num_centroids] = array[:num_centroids]
+    else:
+        padded[-num_centroids:] = array[-num_centroids:]
     return padded
 
 def render(ax, grid, centroids, clusters):

@@ -45,9 +45,11 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
                  centroids_obs_len=10,
                  obs_spec={'type':'absolute',
                            'ag_pos':True,
-                           'i_gain':False},
+                           'i_gain':False,
+                           'only_igain':False},
                  sorting=True,
                  reverse=False,
+                 padding_at_end=False,
                  padding_value=0. ,
                  static_obstacles=False,
                  static_obstacles_seed=None,
@@ -71,6 +73,7 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
         self.centroids_obs_len = centroids_obs_len
         self.sorting = sorting
         self.reverse = reverse
+        self.padding_at_end = padding_at_end
         self.obs_spec = obs_spec
         self.padding_value = padding_value
         self.max_front_cluster_size = max_front_cluster_size
@@ -86,15 +89,21 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
 
         self.max_relative = max(height, width, self.padding_value)
         self.max_distance = max(int(np.sqrt(height**2 + width**2)), self.padding_value) 
-        if self.obs_spec['i_gain']:
+        if self.obs_spec['i_gain'] or self.obs_spec.get('only_igain',False):
             self.max_relative = max(self.max_relative, max_front_cluster_size)
             self.max_distance = max(self.max_distance, max_front_cluster_size)
 
         ## ACTION AND OBSERVATION SPACES
         lowbound = min(0, self.padding_value)
         
-        self.action_space = spaces.Discrete(centroids_obs_len)        
-        if obs_spec['type'] in ['absolute', 'relative']:
+        self.action_space = spaces.Discrete(centroids_obs_len)
+        
+        if obs_spec.get('only_igain',False):
+            self.observation_space = spaces.Box(low=lowbound, 
+                                                high=self.max_distance,
+                                                shape=(centroids_obs_len,),
+                                                dtype=np.float64)
+        elif obs_spec['type'] in ['absolute', 'relative']:
             if obs_spec['type'] == 'relative':
                 lowbound = min(-self.max_relative, self.padding_value)
             n = 3 if obs_spec['i_gain'] else 2
@@ -130,7 +139,9 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
 
 
     def stack_obs(self):
-        if self.obs_spec['type'] in ['absolute', 'relative']:
+        if self.obs_spec.get('only_igain',False):
+            obs = self.info_gain
+        elif self.obs_spec['type'] in ['absolute', 'relative']:
             if self.obs_spec['type'] == 'absolute':
                 obs = self.obs_centroids
             elif self.obs_spec['type'] == 'relative':
