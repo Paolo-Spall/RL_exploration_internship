@@ -37,17 +37,18 @@ class MultiObsFrontAvoidanceEnv(StepMixin, MultiObsFrontBase):
         
         if np.all(target_centroid == self.padding_value):
             obs, reward, terminated, truncated, info = super().step(self.agent_pos)
-            if self.padding_penalty:
-                reward -= 1
-            else:
-                # if not flagged only truncation, no penalty
-                pass
             
-            truncated = True
+            if self.padding_penalty:
+                reward -= 0.1
+            else: # if not flagged only truncation, no penalty
+                pass
+
+            if self.padding_truncation:
+                truncated = True
 
             # render
             if self.render_mode == "human":
-                print(f"Invalid action = {action}: Selected padding element. Episode truncated.")
+                print(f"Invalid action = {action}: Selected padding element.")
 
             return obs, reward, terminated, truncated, info
         
@@ -86,9 +87,9 @@ if __name__ == "__main__":
     
     truncations = 0
     terminations = 0
-    for obs_type in ['relative', 'absolute', 'distance']:#['relative', 'absolute', 'distance']:
-        for info_gain in [True, False]:# [True, False]
-            for ag_pos in [True, False ]:# [True, False]
+    for obs_type in ['relative', ]:#['relative', 'absolute', 'distance']:
+        for info_gain in [True, ]:# [True, False]
+            for ag_pos in [True,  ]:# [True, False]
                 # input("Press Enter to create the new environment...")
                 #print(f"Obs type: {obs_type}, Info gain: {info_gain}, Agent pos: {ag_pos}")
                 print("Creating environment...")
@@ -99,12 +100,13 @@ if __name__ == "__main__":
                                             perc_range=perc_range, 
                                             render_mode=  "human", # "human", None,
                                             sorting=True,
-                                            reverse=True,
+                                            reverse=False,
                                             obs_spec={'type':obs_type,
                                                     'ag_pos':ag_pos,
                                                     'i_gain':info_gain},
                                             static_obstacles=True,
-                                            static_obstacles_seed=42
+                                            static_obstacles_seed=42,
+                                            padding_truncation = False,
                                             )
                 #for i in range(50):
 
@@ -162,7 +164,7 @@ if __name__ == "__main__":
                     
 
                     #action = np.random.randint(0, len(centroids))
-                    obs, reward, term,  trunc, _ = env.step(action)
+                    obs, reward, term,  trunc, _ = env.step(action=9)
 
                 if trunc:
                     truncations += 1

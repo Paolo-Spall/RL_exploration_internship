@@ -4,7 +4,7 @@ import numpy as np
 from stable_baselines3.common.evaluation import evaluate_policy
 from gymnasium.wrappers import RecordVideo
 
-from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_config, wrap_model_evaluation
+from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_config, open_model_config, wrap_model_evaluation
 
 
 ####   EVALUATION
@@ -49,8 +49,14 @@ def evaluate_action_stats(model, env, n_eval_episodes=10):
     
     return action_stats
 
-def evaluate_model(model_name, check=False, dir=""):
-    config = open_config(model_name, dir=dir)
+def evaluate_model(model_name, check=False, dir="", notrunc_flag=False):
+    config = open_model_config(model_name, dir=dir)
+    if notrunc_flag:
+        notrunc_str = "no-trunc_"
+        print("Evaluation with NO TRUNCATION of episodes.")
+        config['env']['padding_truncation'] = False
+    else:
+        notrunc_str = ""
 
     model_name = config['model_name']
         
@@ -85,7 +91,7 @@ def evaluate_model(model_name, check=False, dir=""):
     print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
     print(f"Action stats: mean = {action_stats['mean_action']:.4f} +/- {action_stats['std_action']:.4f}")
 
-    output_file = f"models/{dir}evaluation_{model_name}.txt"
+    output_file = f"models/{dir}evaluation_{notrunc_str}{model_name}.txt"
     with open(output_file, "a") as f:
         f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")
         f.write(f"Action statistics:\n")

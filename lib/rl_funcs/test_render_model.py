@@ -9,7 +9,7 @@ from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checke
 
 ## RENDER MODEL WITHOUT SAVING VIDEO
 
-def test_render_model(model_name, check=False, dir=""):
+def test_render_model(model_name, check=False, dir="", seed=None):
     """Render model in human mode without saving video"""
     if dir:
         dir = dir.strip("/")+"/"
@@ -32,7 +32,7 @@ def test_render_model(model_name, check=False, dir=""):
     model = model_class.load(f"models/{dir}{model_name}", env=env, device="cpu")
     print("Model loaded.")
 
-    obs, _ = env.reset()
+    obs, _ = env.reset(seed=seed)
     tot_reward = 0
     all_actions = []
 

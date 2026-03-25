@@ -78,10 +78,10 @@ class StepMixin:
             and new_pos == self.prev_prev_pos
             and old_pos == self.prev_pos
         ):
-            reward -= 0.05
+            reward -= 0.05  # penalty for oscillation
 
         self.prev_prev_pos = self.prev_pos
-        self.prev_pos = old_pos
+        self.prev_pos = new_pos
         
         # no progress for too many steps
         if self.no_progress_steps >= 20:

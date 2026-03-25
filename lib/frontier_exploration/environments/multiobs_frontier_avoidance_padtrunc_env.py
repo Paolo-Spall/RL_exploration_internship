@@ -1,60 +1,82 @@
 #/usr/bin/python3
+
 import numpy as np
 
 if __name__ == "__main__":
+    from stable_baselines3.common.env_checker import check_env 
     import sys
-    from stable_baselines3.common.env_checker import check_env
-    
     sys.path.append(".")
-
-from lib.frontier_exploration.environments.dynamics import StepMixin
+    
 from lib.frontier_exploration.environments.multiobs_front_base import MultiObsFrontBase
-from lib.utils import step_toward
-
-class MultiObsFrontierEnv(StepMixin, MultiObsFrontBase):
-    """MultiObsFrontBase ( FrontierMixin + ObstGridAgentExplEnv ( 
-                                                ObstGridAgentEnv (
-                                                    ObstGridEnv ( gym.Env) ) ) )
-       + StepMixin (step and reset methods for frontier-based exploration)
-    """
+from lib.frontier_exploration.environments.dynamics import StepMixin
+from lib.frontier_exploration.planning.obst_avoidance import ObstAvoidance
+from lib.utils import greedy_index, step_toward
+    
+    
+class MultiObsFrontAvoidancePadtruncEnv(StepMixin, MultiObsFrontBase):
+    moves = [np.array([1, 0]),   # Move right (positive x)
+             np.array([0, 1]),   # Move up (positive y)
+             np.array([-1, 0]),  # Move left (negative x)
+             np.array([0, -1])]  # Move down (negative y)
+    
     def __init__(self, *args, **kwargs):
+        self.avoidance = ObstAvoidance(self.obstacle_color, self.moves)
         super().__init__(*args, **kwargs)
     
     def reset(self, seed=None, *args, **kwargs):
         super().reset(seed=seed, *args, **kwargs)
         
-        return self.mixin_reset()
-    
+        return self.mixin_reset()   
+
     def step(self, action):
         """action: index of the target centroid
         """
 
         # extracting the target centroid coordinates
         target_centroid = np.array(self.obs_centroids[action].copy(), dtype=np.int64)
-
-        # case of SELECTED PADDING ELEMENT 
+        
         if np.all(target_centroid == self.padding_value):
-            # running the StepMixin step(<current position>) anyway ??
             obs, reward, terminated, truncated, info = super().step(self.agent_pos)
+            
             if self.padding_penalty:
                 reward -= 1
-            else:
-                # if not flagged only truncation, no penalty
+            else: # if not flagged only truncation, no penalty
                 pass
-            truncated = True
+
+            if self.padding_truncation:
+                truncated = True
 
             # render
             if self.render_mode == "human":
-                print(f"Invalid action = {action}: Selected padding element. Episode truncated.")
-            
+                print(f"Invalid action = {action}: Selected padding element.")
+
             return obs, reward, terminated, truncated, info
         
-        # computing the next position toward the target centroid
-        next_pos = step_toward(self.agent_pos, target_centroid, manhattan=True)
+
+        if self.avoidance.active(target_centroid):
+            next_pos = self.avoidance.get_next()
+        
+        else:
+            
+            # computing the next position toward the target centroid
+            next_pos = step_toward(self.agent_pos, target_centroid, manhattan=True)
 
         if self.render_mode == "human":
             print("Action: ", action, "Target centroid: ", target_centroid)
 
+        if self.is_obstacle(next_pos[0], next_pos[1]):
+            self.avoidance.compute_path(self.obs_grid,
+                                              self.agent_pos,
+                                              target_centroid)
+            if self.avoidance.path is None:
+                obs, reward, terminated, truncated, info = super().step(self.agent_pos)
+                reward -= 1
+                truncated = True
+                return obs, reward, terminated, truncated, info
+
+            else:
+                next_pos = self.avoidance.get_next()
+            
         return super().step(next_pos)
 
 if __name__ == "__main__":
@@ -65,25 +87,26 @@ if __name__ == "__main__":
     
     truncations = 0
     terminations = 0
-    for obs_type in ['relative']:#['relative', 'absolute', 'distance']:
-        for info_gain in [ False]:# [True, False]
-            for ag_pos in [ False ]:# [True, False]
+    for obs_type in ['relative', ]:#['relative', 'absolute', 'distance']:
+        for info_gain in [True, ]:# [True, False]
+            for ag_pos in [True,  ]:# [True, False]
                 # input("Press Enter to create the new environment...")
                 #print(f"Obs type: {obs_type}, Info gain: {info_gain}, Agent pos: {ag_pos}")
                 print("Creating environment...")
-                env = MultiObsFrontierEnv(  width=width, 
+                env = MultiObsFrontAvoidancePadtruncEnv(  width=width, 
                                             height=height, 
                                             obstacle_prob=obstacle_prob, 
                                             target_discovery_percent=target_discovery_percent,
                                             perc_range=perc_range, 
                                             render_mode=  "human", # "human", None,
-                                            sorting=False,
-                                            reverse=True,
+                                            sorting=True,
+                                            reverse=False,
                                             obs_spec={'type':obs_type,
                                                     'ag_pos':ag_pos,
                                                     'i_gain':info_gain},
                                             static_obstacles=True,
-                                            static_obstacles_seed=42
+                                            static_obstacles_seed=42,
+                                            padding_truncation = False,
                                             )
                 #for i in range(50):
 
@@ -141,7 +164,7 @@ if __name__ == "__main__":
                     
 
                     #action = np.random.randint(0, len(centroids))
-                    obs, reward, term,  trunc, _ = env.step(action)
+                    obs, reward, term,  trunc, _ = env.step(action=9)
 
                 if trunc:
                     truncations += 1
@@ -150,3 +173,11 @@ if __name__ == "__main__":
                     terminations += 1
                     print("Exploration completed.")
     print(f"Total terminations: {terminations}, Total truncations: {truncations}")
+# import joblib 
+# env.init_simulation_render()
+# save = input('Save?')
+# if save == 'y':
+#     joblib.dump([env.obs_grid,
+#                 env.clusters,
+#                 env.centroids],
+#              'frontiers_grid.joblib')

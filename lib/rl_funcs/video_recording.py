@@ -10,7 +10,7 @@ import os
 
 from gymnasium.wrappers import RecordVideo
 
-from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_config
+from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_config, open_model_config
 
 
 
@@ -22,7 +22,8 @@ def record_model_video(
     deterministic=True,
     check=False,
     seed=None,
-    dir=""):
+    dir="",
+    notrunc_flag=False):
     """Record and save a video of the environment rendering for a trained model.
 
     Args:
@@ -33,8 +34,15 @@ def record_model_video(
         deterministic: Whether to use deterministic actions.
         check: If True, run Gym environment checks.
     """
-    config = open_config(model_name, dir=dir)
+    config = open_model_config(model_name, dir=dir)
     config["env"]["render_mode"] = None
+    
+    if notrunc_flag:
+        notrunc_str = "no-trunc_"
+        config['env']['padding_truncation'] = False
+    else:
+        notrunc_str = ""
+        
     model_name = config["model_name"]
 
     env = initialize_env(config)

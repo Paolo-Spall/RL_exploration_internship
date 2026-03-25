@@ -20,6 +20,6 @@ else:
 # MultiObsFrontierEnv_absolute_agent_DQN_dynamic_5e5,16.46,1.52,00:58:35
     dir = "batchtry"
 
-test_render_model(model_name, dir=dir)
+test_render_model(model_name, dir=dir, seed=0)
 
 

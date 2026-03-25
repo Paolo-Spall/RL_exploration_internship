@@ -54,7 +54,8 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
                  static_obstacles=False,
                  static_obstacles_seed=None,
                  max_front_cluster_size=None,
-                 padding_penalty=False
+                 padding_penalty=False,
+                 padding_truncation=False
                  ):
         
         super().__init__(perception_range=perc_range, 
@@ -79,6 +80,7 @@ class MultiObsFrontBase(FrontierMixin, ObstGridAgentExplEnv):
         self.max_front_cluster_size = max_front_cluster_size
         self.total_cells = width * height
         self.padding_penalty = padding_penalty
+        self.padding_truncation = padding_truncation
 
         
 
