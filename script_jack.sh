@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-python3 script_train.py -dir batch_25-03_abs-agent-igain_not-sorted_padding-1_30x40_perc5_1e6
+python3 script_train.py -dir batch_26-03_only-igain_sorted_1e6
