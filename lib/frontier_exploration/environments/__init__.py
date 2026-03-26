@@ -1,2 +1,3 @@
 from .multiobs_frontier_env import MultiObsFrontierEnv
 from .multiobs_frontier_avoidance_env import MultiObsFrontAvoidanceEnv
+from .multiobs_frontier_avoidance_padtrunc_env  import  MultiObsFrontAvoidancePadtruncEnv

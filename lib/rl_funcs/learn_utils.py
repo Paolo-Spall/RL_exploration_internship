@@ -10,12 +10,14 @@ import time
 from time import perf_counter
 
 from stable_baselines3 import DQN, PPO
-from lib.free_RL_exploration.environments import SimpleTargetAgentEnv,\
+from lib.free_RL_exploration.environments import    SimpleTargetAgentEnv,\
                                                     SimpleTargetAgentFlatEnv, \
                                                     MultiobsSimpleTargetAgentEnv, \
                                                     MultiobsSimpleAgentExplorationEnv
-from lib.frontier_exploration.environments import MultiObsFrontierEnv, \
-                                                  MultiObsFrontAvoidanceEnv
+                                                    
+from lib.frontier_exploration.environments import   MultiObsFrontierEnv, \
+                                                    MultiObsFrontAvoidanceEnv,\
+                                                    MultiObsFrontAvoidancePadtruncEnv
 
 
 # decorator to monitor function time

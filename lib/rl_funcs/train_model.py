@@ -58,7 +58,7 @@ def train_model(model_name, check=False, dir=""):
     eval_env.norm_obs = False
     
     # Setup EvalCallback
-    eval_freq = config['training'].get('eval_freq', 10000)
+    eval_freq = config['training'].get('eval_freq', 5000)
     n_eval_episodes = config['training'].get('n_eval_episodes', 10)
     best_model_path = f"{exp_dir}/best_model_{model_name}"
     eval_log_path = f"{exp_dir}/eval_logs_{model_name}"

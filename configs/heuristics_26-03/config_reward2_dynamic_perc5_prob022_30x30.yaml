@@ -1,0 +1,19 @@
+env:
+  centroids_obs_len: 10
+  height: 30
+  max_steps: 500
+  obs_spec:
+    ag_pos: false
+    i_gain: true
+    type: distance
+    only_igain: false
+  obstacle_prob: 0.022
+  perc_range: 5
+  render_mode: null
+  reverse: false
+  sorting: true
+  target_discovery_percent: 0.9
+  width: 30
+env_class: MultiObsFrontAvoidanceEnv
+model_name: reward2_dynamic_30x30
+

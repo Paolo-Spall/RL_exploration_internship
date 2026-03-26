@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import yaml
 
 
 from lib.rl_funcs.learn_utils import get_policy_class, initialize_env,  wrap_model, my_checkenv, open_model_config
@@ -31,8 +32,17 @@ def run_greedy(env, max_steps, heuristic="distance"):
 
     return tot_reward
 
-def evaluate_heuristic(model_name, n_episodes=30 ,check=False, heuristic="distance", render=False):
-    config = open_model_config(model_name)
+def evaluate_heuristic(model_name, 
+                       n_episodes=30 ,
+                       check=False, 
+                       heuristic="distance", 
+                       render=False,
+                       dir=""):
+    
+    config_file = f"models/{dir}config_{model_name}.yaml"
+    with open(config_file, 'r') as f:
+        config = yaml.safe_load(f)
+        
     config['obs_spec'] = {"ag_pos": False,
                           "i_gain": True,
                           "type": "distance"}
@@ -63,7 +73,7 @@ def evaluate_heuristic(model_name, n_episodes=30 ,check=False, heuristic="distan
     if render:
         pass
     else:
-        output_file = f"models/heuristic_results_{heuristic}_{model_name}.txt"
+        output_file = f"models/{dir}heuristic_results_{heuristic}_{model_name}.txt"
         with open(output_file, "a") as f:
             f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")
         print(f"Evaluation results saved to {output_file}")
