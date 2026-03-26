@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-python3 script_train.py -dir batch_26-03_distance_sorted_1e5
+python3 script_train.py -dir batch_25-03_abs-agent_30x30_perc5_prob022_5e5
