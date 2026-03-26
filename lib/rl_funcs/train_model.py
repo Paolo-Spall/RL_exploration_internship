@@ -1,5 +1,6 @@
 
 from math import log
+import os
 
 from lib.rl_funcs.learn_utils import training_time_monitor, get_policy_class, initialize_env,  wrap_model, my_checkenv, open_config
 from stable_baselines3.common.callbacks import EvalCallback
@@ -20,10 +21,14 @@ def learn_model(model, training_config, callback=None):
     return model
 
 def train_model(model_name, check=False, dir=""):
+    exp_dir = f"models/{dir}{model_name}"
+    #create folder for the experiment
+    os.makedirs(exp_dir, exist_ok=True)
+    
     config = open_config(model_name, save_copy=True, dir=dir)
     model_name = config['model_name']
 
-    exp_dir = f"models/{dir}{model_name}"
+    
 
     env = initialize_env(config, training=True)
     if check:
