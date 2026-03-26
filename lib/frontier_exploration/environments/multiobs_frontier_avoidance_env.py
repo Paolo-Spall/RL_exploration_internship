@@ -80,14 +80,14 @@ class MultiObsFrontAvoidanceEnv(StepMixin, MultiObsFrontBase):
         return super().step(next_pos)
 
 if __name__ == "__main__":
-    width, height = 20, 20
-    obstacle_prob = 0.025
+    width, height = 30, 30
+    obstacle_prob = 0.022
     target_discovery_percent = 0.9
-    perc_range = 3
+    perc_range = 5
     
     truncations = 0
     terminations = 0
-    for obs_type in ['relative', ]:#['relative', 'absolute', 'distance']:
+    for obs_type in ['absolute', ]:#['relative', 'absolute', 'distance']:
         for info_gain in [True, ]:# [True, False]
             for ag_pos in [True,  ]:# [True, False]
                 # input("Press Enter to create the new environment...")
@@ -164,7 +164,7 @@ if __name__ == "__main__":
                     
 
                     #action = np.random.randint(0, len(centroids))
-                    obs, reward, term,  trunc, _ = env.step(action=9)
+                    obs, reward, term,  trunc, _ = env.step(action=action)
 
                 if trunc:
                     truncations += 1

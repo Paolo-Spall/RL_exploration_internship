@@ -159,8 +159,8 @@ class ObstGridEnv(gym.Env):
 
 
 if __name__ == "__main__":
-    width, height = 20, 20
-    obstacle_prob = 0.05
+    width, height = 30, 30
+    obstacle_prob = 0.022
     print("Creating environment...")
     env = ObstGridEnv(width=width, 
                        height=height, 
