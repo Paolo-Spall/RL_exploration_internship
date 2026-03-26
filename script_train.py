@@ -1,5 +1,8 @@
 
 from math import exp
+from pyexpat import model
+
+from imageio import config
 
 from lib.rl_funcs import train_model, evaluate_model
 from lib.rl_funcs.video_recording import record_model_video
@@ -87,7 +90,12 @@ for model_name in model_names:
     elapsed_time , experiment_dir = train_model(model_name ,check=True, dir=dir)
     play_sound("/usr/share/sounds/sound-icons/start")
 
-    mean_reward, std_reward, mean_action, std_action = evaluate_model(model_name, dir= experiment_dir)
+    config_filepath = f"{experiment_dir}/config_{model_name}"
+    model_filepath = f"{experiment_dir}/{model_name}"
+
+    mean_reward, std_reward, mean_action, std_action = evaluate_model(model_filepath, 
+                                                                      config_filepath, 
+                                                                      dir=experiment_dir)
     with open(table_file, "a") as f_table, open(csv_file, "a") as f_csv:
         f_table.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{mean_action:.4f},{std_action:.4f},{elapsed_time}")
         f_csv.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{mean_action:.4f},{std_action:.4f},{elapsed_time}")

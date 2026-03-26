@@ -64,6 +64,11 @@ def open_model_config(model_name, save_copy=False, dir=""):
         config = yaml.safe_load(f)
     return config
 
+def open_config_fromname(config_filename):
+    config_file = f"{config_filename}.yaml"
+    with open(config_file, 'r') as f:
+        config = yaml.safe_load(f)
+    return config
 
 def get_policy_class(config):
     class_str = config.get('model_class')
