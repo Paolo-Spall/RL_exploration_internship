@@ -1,4 +1,6 @@
 
+from math import exp
+
 from lib.rl_funcs import train_model, evaluate_model
 from lib.rl_funcs.video_recording import record_model_video
 import sys
@@ -26,6 +28,7 @@ if len(sys.argv) > 1:
         os.makedirs(out_dir, exist_ok=True)
     else:
         dir = ""
+        out_dir = "models/"+dir.strip("/")
         model_names = sys.argv[1:]
 else:
     model_names = ['MultiObsFrontierEnv_absolute_DQN_1e5',
@@ -57,10 +60,10 @@ else:
 #     
  
 
-table_file = 'models/' + dir + "evaluation_results_0.txt"
+table_file = out_dir + "/evaluation_results_0.txt"
 n=0
 while os.path.exists(table_file): 
-    table_file = 'models/' + dir + f"evaluation_results_{n}.txt"
+    table_file = out_dir + f"/evaluation_results_{n}.txt"
     n+=1
 
 csv_file = table_file.replace(".txt", f"_{dir.strip('/')}.csv")
@@ -81,10 +84,10 @@ print()
 print("========================================")  
 
 for model_name in model_names:
-    elapsed_time = train_model(model_name ,check=True, dir=dir)
+    elapsed_time , experiment_dir = train_model(model_name ,check=True, dir=dir)
     play_sound("/usr/share/sounds/sound-icons/start")
 
-    mean_reward, std_reward, mean_action, std_action = evaluate_model(model_name, dir= dir)
+    mean_reward, std_reward, mean_action, std_action = evaluate_model(model_name, dir= experiment_dir)
     with open(table_file, "a") as f_table, open(csv_file, "a") as f_csv:
         f_table.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{mean_action:.4f},{std_action:.4f},{elapsed_time}")
         f_csv.write(f"\n{model_name},{mean_reward:.2f},{std_reward:.2f},{mean_action:.4f},{std_action:.4f},{elapsed_time}")
@@ -92,13 +95,13 @@ for model_name in model_names:
     if not no_video:
         record_model_video(
             model_name,
-            output_path=f"models/{dir}video_{model_name}.mp4",
+            output_path=f"{experiment_dir}/video_{model_name}.mp4",
             max_steps=None,
             fps=4,
             deterministic=True,
             check=False,
             seed=0,
-            dir=dir
+            dir=experiment_dir,
         )
     else:
         print("Skipping video recording as per user request.")

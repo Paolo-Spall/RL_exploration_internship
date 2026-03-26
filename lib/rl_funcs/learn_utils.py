@@ -55,11 +55,11 @@ def open_config(model_name, save_copy=False, dir=""):
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
     if save_copy:
-        yaml.dump(config, open(f"models/{dir}config_{model_name}.yaml", 'w'))  # Save a copy of the config in the models folder
+        yaml.dump(config, open(f"models/{dir}{model_name}/config_{model_name}.yaml", 'w'))  # Save a copy of the config in the models folder
     return config
 
 def open_model_config(model_name, save_copy=False, dir=""):
-    config_file = f"models/{dir}config_{model_name}.yaml"
+    config_file = f"{dir}config_{model_name}.yaml"
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
     return config
@@ -116,5 +116,5 @@ def wrap_model_evaluation(env, config, model_name=None, dir="models"):
     if wrapper_config.get('Monitor') or wrapper_config.get('VecMonitor'):
         env = Monitor(env)
     if wrapper_config.get('VecNormalize'):
-        env = VecNormalize.load(f"models/{dir}vec_normalize_{model_name}.pkl", env)
+        env = VecNormalize.load(f"{dir}vec_normalize_{model_name}.pkl", env)
     return env

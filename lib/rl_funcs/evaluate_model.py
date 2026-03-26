@@ -63,6 +63,9 @@ def evaluate_action_stats(model, env, n_eval_episodes=30):
     return action_stats
 
 def evaluate_model(model_name, check=False, dir="", notrunc_flag=False):
+    if dir:
+        dir = dir.strip('/') +'/'
+
     config = open_model_config(model_name, dir=dir)
     if notrunc_flag:
         notrunc_str = "no-trunc_"
@@ -92,7 +95,7 @@ def evaluate_model(model_name, check=False, dir="", notrunc_flag=False):
     
     model_class = get_policy_class(config)
 
-    model = model_class.load(f"models/{dir}{model_name}", env=eval_env, device="cpu")
+    model = model_class.load(f"{dir}{model_name}", env=eval_env, device="cpu")
 
     mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=30)
 
@@ -104,7 +107,7 @@ def evaluate_model(model_name, check=False, dir="", notrunc_flag=False):
     print(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}")
     print(f"Action stats: mean = {action_stats['mean_action']:.4f} +/- {action_stats['std_action']:.4f}")
 
-    output_file = f"models/{dir}evaluation_{notrunc_str}{model_name}.txt"
+    output_file = f"{dir}evaluation_{notrunc_str}{model_name}.txt"
     with open(output_file, "a") as f:
         f.write(f"Mean reward = {mean_reward:.2f} +/- {std_reward:.2f}\n")
         f.write(f"Action statistics:\n")

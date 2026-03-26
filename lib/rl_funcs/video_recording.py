@@ -34,6 +34,9 @@ def record_model_video(
         deterministic: Whether to use deterministic actions.
         check: If True, run Gym environment checks.
     """
+
+    if dir:
+        dir = dir.strip('/') +'/'
     config = open_model_config(model_name, dir=dir)
     config["env"]["render_mode"] = None
     
@@ -54,7 +57,7 @@ def record_model_video(
     model_class = get_policy_class(config)
 
     print("Loading trained model...")
-    model = model_class.load(f"models/{dir}{model_name}", env=env, device="cpu")
+    model = model_class.load(f"{dir}{model_name}", env=env, device="cpu")
     print("Model loaded.")
 
     if not hasattr(env, "fig") or env.fig is None:
