@@ -1,0 +1,15 @@
+Action statistics:
+  Mean action: 0.0000
+  Std action: 0.0000
+  Min action: 0.0000
+  Max action: 0.0000
+  Action distribution: {0: 1.0}
+
+Sorted action statistics:
+  Mean action (sorted): 0.5000
+  Std action (sorted): 0.5000
+  Action distribution (sorted): {0: 1.0, 1: 1.0}
+
+Episode statistics:
+  Terminations: 30/30 (100.00%)
+  Truncations: 0/30

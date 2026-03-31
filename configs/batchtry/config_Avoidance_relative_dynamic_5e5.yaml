@@ -30,6 +30,6 @@ model_class: DQN
 model_name: Avoidance_relative_dynamic_5e5
 train: true
 training:
-  total_timesteps: 600
+  total_timesteps: 21000
 wrapper:
   Monitor: true

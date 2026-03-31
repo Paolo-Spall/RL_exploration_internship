@@ -7,6 +7,7 @@ from matplotlib.animation import FuncAnimation
 from functools import partial
 import imageio.v2 as imageio
 import os
+import yaml
 
 from gymnasium.wrappers import RecordVideo
 
@@ -23,7 +24,9 @@ def record_model_video(
     check=False,
     seed=None,
     dir="",
-    notrunc_flag=False):
+    notrunc_flag=False,
+    custom = None,
+    config_path = None,):
     """Record and save a video of the environment rendering for a trained model.
 
     Args:
@@ -37,7 +40,21 @@ def record_model_video(
 
     if dir:
         dir = dir.strip('/') +'/'
-    config = open_model_config(model_name, dir=dir)
+    
+    if custom is not None:
+        config_path = config_path.replace(".yaml", "")
+        config_file = f"{config_path}.yaml"
+        
+        model_path = model_name
+        model_name = os.path.basename(model_path)
+    else:
+        config_file = f"{dir}config_{model_name}.yaml"
+        
+    with open(config_file, 'r') as f:
+        config = yaml.safe_load(f)
+
+
+
     config["env"]["render_mode"] = None
     
     if notrunc_flag:
@@ -57,7 +74,10 @@ def record_model_video(
     model_class = get_policy_class(config)
 
     print("Loading trained model...")
-    model = model_class.load(f"{dir}{model_name}", env=env, device="cpu")
+    if custom:
+        model = model_class.load(model_path, env=env, device="cpu")
+    else:
+        model = model_class.load(f"{dir}{model_name}", env=env, device="cpu")
     print("Model loaded.")
 
     if not hasattr(env, "fig") or env.fig is None:

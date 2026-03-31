@@ -58,8 +58,8 @@ def train_model(model_name, check=False, dir=""):
     eval_env.norm_obs = False
     
     # Setup EvalCallback
-    eval_freq = config['training'].get('eval_freq', 5000)
-    n_eval_episodes = config['training'].get('n_eval_episodes', 10)
+    eval_freq = config['training'].get('eval_freq', 20_000)
+    n_eval_episodes = config['training'].get('n_eval_episodes', 20)
     best_model_path = f"{exp_dir}/best_model_{model_name}"
     eval_log_path = f"{exp_dir}/eval_logs_{model_name}"
     
@@ -90,7 +90,7 @@ def train_model(model_name, check=False, dir=""):
     with open(output_file, "w") as f:
         f.write(f"Training time: {training_time}\n")
         
-    return training_time, exp_dir
+    return training_time, exp_dir, best_model_path
 
 
 if __name__ == "__main__":

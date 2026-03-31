@@ -33,7 +33,7 @@ def run_greedy(env, max_steps, heuristic="distance"):
     return tot_reward
 
 def evaluate_heuristic(model_name, 
-                       n_episodes=30 ,
+                       n_episodes=100 ,
                        check=False, 
                        heuristic="distance", 
                        render=False,

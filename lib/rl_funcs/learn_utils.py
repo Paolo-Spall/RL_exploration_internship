@@ -67,6 +67,8 @@ def open_model_config(model_name, save_copy=False, dir=""):
     return config
 
 def open_config_fromname(config_filename):
+    # take off the extension from name if it is there
+    config_filename = config_filename.replace(".yaml", "")
     config_file = f"{config_filename}.yaml"
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
