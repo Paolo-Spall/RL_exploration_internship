@@ -1,26 +1,30 @@
 
 
 import numpy as np
+import os
 
-from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_model_config
+from lib.rl_funcs.learn_utils import get_policy_class, initialize_env, my_checkenv, open_config_fromname, open_model_config
 
 
 
 
 ## RENDER MODEL WITHOUT SAVING VIDEO
 
-def test_render_model(model_name, check=False, dir="", seed=None):
+def test_render_model(model_filepath, config_filepath, check=False, dir="", seed=None):
     """Render model in human mode without saving video"""
     if dir:
         dir = dir.strip("/")+"/"
 
-    config = open_model_config(model_name, dir=dir)
+    model_filename = os.path.basename(model_filepath).removesuffix(".zip")
+
+    config_filename = os.path.basename(config_filepath)
+    config = open_config_fromname(config_filepath)
 
     config['env']['render_mode'] = 'human'
     model_name = config['model_name']
 
     env = initialize_env(config)
-    print(f"\nTesting rendering for model: {model_name}")
+    print(f"\nTesting rendering for model: {model_filename}")
 
     if check:
         my_checkenv(env, model_name)
@@ -29,7 +33,7 @@ def test_render_model(model_name, check=False, dir="", seed=None):
 
     print("Loading trained model...")
     # Force CPU to avoid CUDA driver/runtime issues when loading the model
-    model = model_class.load(f"models/{dir}{model_name}", env=env, device="cpu")
+    model = model_class.load(model_filepath, env=env, device="cpu")
     print("Model loaded.")
 
     obs, _ = env.reset(seed=seed)
