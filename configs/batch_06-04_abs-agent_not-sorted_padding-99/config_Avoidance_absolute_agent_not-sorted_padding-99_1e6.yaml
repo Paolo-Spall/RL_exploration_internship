@@ -29,7 +29,7 @@ model:
   train_freq: 4
   verbose: 0
 model_class: DQN
-model_name: Avoidance_absolute_agent_static_not-sorted_pad-9_1e6
+model_name: Avoidance_absolute_agent_not-sorted_padding-99_1e6
 train: true
 training:
   total_timesteps: 1000000
